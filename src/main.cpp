@@ -1,10 +1,11 @@
-// Melissa Castillo 
+// Melissa Castillo, mcast052 
+// Jeremy Chan, jchan107
 // CS100 ASSIGNMENT 1, main.cpp 
-// 10/25/2015 
+
 #include <iostream> 
-<<<<<<< HEAD
 #include <boost/tokenizer.hpp> 
 #include <string>
+#include <"connections.h"> 
 using namespace std;
 using namespace boost;
 
@@ -63,50 +64,54 @@ int main()
             cout << commands.at(i).at(j)<< " ";
         }
         cout << endl;
-    }
-=======
-#include <boost/tokenizer.hpp>
-#include "connectors.h" 
-
-using namespace std; 
-using namespace boost;  
-int main(int argc, char* argv[])
-{
-    string line; 
-    getline(cin, line); 
-    tokenizer<> tok(line);     
+    }   
     
-    vector<Connectors *> v; 
-    tokenizer::iterator it; 
-    char args[100]; 
-    int i = 0; 
-    for(it = tok.begin(); it != tok.end(); it++)
-    {   
-        if(*it == ";" || *it == "&&" || *it == "||")
+    //Vector that will hold objects of our class
+    vector<Connectors *> args;   
+    for(unsigned int i = 0; i < commands.size(); i++) 
+    //Traverses through outer vector 
+    {
+        //SPECIAL CASE: First command is always run
+        if(i == 0) 
         {
-            arr[i + 1] = NULL; //adds NULL to the end of array
-            if(*it == ";") 
-            {
-                Semicolon S(1, args); 
-                v.pushback(S);    
-            }
-            else if(*it == "&&")
-            {
-                AND A(1, args);
-                v.pushback(A);   
-            }
-            else
-            {
-                OR O(1, args); 
-                v.pushback(O);
-            } 
-            i = 0 
-            //then clear v
+            //Sets bool to true, command always run
+            new Semicolon obj(1, commands.at(i) ); 
         }
-        else
-        args[i] = *it; 
-        i++;
-    }       
->>>>>>> a58b50f7d1383c10a542b3cd9b62d4dd14aa2e16
+        else if(commands.at(i).at(0) == ";") 
+        {
+            //Gets vector<string> to the right
+            //Does not take the actual sign 
+            new Semicolon obj(1, commands.at(i + 1);
+        } 
+        else if(commands.at(i).at(0) == "&&")
+        { 
+            //Sets bool to false, so it does not run w/o checking
+            new AND obj(0, commands.at(i + 1) ); 
+        }
+        else if(commands.at(i).at(0) == "||")
+        {
+            //Sets bool to true, so it does not run w/o checking   
+            new OR obj(1, commands.at(i + 1) ); 
+        }
+    }    
+    
+    //Executes each command
+    for(unsigned int i = 0; i < args.size(); i++)
+    {
+        //Dynamically calls appropriate execute() function
+        args.at(i).exectute();
+        //Variable holds whether the current command failed or succeeded
+        bool prev = args.at(i).check_prevstate(); 
+        //Changes next command's bool to prev
+        args.at(i + 1).set_prevstate(prev); 
+    }  
+
+    //Deallocates objects and removes pointers
+    for(unsigned int i = 0; i < args.size(); i++)
+    { 
+        delete args[i]; 
+    } 
+    args.clear();     
+       
     return 0; 
 }
