@@ -6,11 +6,11 @@
 #include <boost/tokenizer.hpp> 
 #include <string>
 #include "connections.h" 
-using namespace std;
-using namespace boost;
 
 int main()
 {
+    using namespace std; 
+    using namespace boost; 
     string tkn_check;
     getline(cin,tkn_check);
 
@@ -56,10 +56,10 @@ int main()
     
     //outputs the vector
 
-    for(int i = 0; i < commands.size(); i++)
+    for(unsigned int i = 0; i < commands.size(); i++)
     {
         cout << "Command at vector " << i << " contains: " ;
-        for(int j = 0; j < commands.at(i).size();j++)
+        for(unsigned int j = 0; j < commands.at(i).size();j++)
         {
             cout << commands.at(i).at(j)<< " ";
         }
@@ -75,27 +75,27 @@ int main()
         if(i == 0) 
         {
             //Sets bool to true, command always run
-            new Semicolon obj(1, commands.at(i) ); 
-            args.push_back(obj); 
+            args.push_back(new Semicolon_Connector(1, commands.at(i) )); 
+            //args.push_back(obj);
         }
         else if(commands.at(i).at(0) == ";") 
         {
             //Gets vector<string> to the right
             //Does not take the actual sign 
-            new Semicolon obj(1, commands.at(i + 1);
-            args.push_back(obj);
+            args.push_back(new Semicolon_Connector(1, commands.at(i + 1)));
+           // args.push_back(obj);
         } 
         else if(commands.at(i).at(0) == "&&")
         { 
             //Sets bool to false, so it does not run w/o checking
-            new AND obj(0, commands.at(i + 1) ); 
-            args.push_back(obj); 
+            args.push_back(new AND_Connector(0, commands.at(i + 1) )); 
+            //args.push_back(obj); 
         }
         else if(commands.at(i).at(0) == "||")
         {
             //Sets bool to true, so it does not run w/o checking   
-            new OR obj(1, commands.at(i + 1) );
-            args.push_back(obj);  
+            args.push_back(new OR_Connector (1, commands.at(i + 1) ));
+            //args.push_back(obj);  
         }
     }    
     
@@ -119,3 +119,4 @@ int main()
        
     return 0; 
 }
+
