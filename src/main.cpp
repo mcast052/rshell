@@ -9,14 +9,14 @@
 int main()
 {
     using namespace std; 
-    using namespace boost; 
+    using namespace boost;
+    cout <<"$ "; 
     string tkn_check;
     getline(cin,tkn_check);
 
     //parses
-
     typedef tokenizer<char_separator<char> > tokenizer;
-    char_separator<char> sep(" ",";");
+    char_separator<char> sep(" $",";#");
     tokenizer tkn(tkn_check,sep);
 
     //Shows where it is parsed
@@ -31,9 +31,17 @@ int main()
     vector< vector<string> > commands;
     vector<string> indivCommand;
 
-    for(tokenizer::iterator iter2 = tkn.begin();iter2 != tkn.end();
+    tokenizer::iterator iter2;
+    bool ifHash = false;
+    for(iter2 = tkn.begin();iter2 != tkn.end();
     ++iter2)
     {
+        if(*iter2 == "#")
+        {
+            indivCommand.push_back(*iter2);
+            ifHash = true;
+            break;
+        }
         if(*iter2 == ";" || *iter2 == "||" || *iter2 == "&&")
         {
             commands.push_back(indivCommand);
@@ -47,8 +55,8 @@ int main()
             indivCommand.push_back(*iter2);
         }
     }
-    //pushes last command into the vector
-    if(!indivCommand.empty())
+    //makes sure hash doesnt go into the commands vector
+    if(!indivCommand.empty()&& ifHash == false)
     {
         commands.push_back(indivCommand);
     }
@@ -79,35 +87,53 @@ int main()
         }
         else if(commands.at(i).at(0) == ";") 
         {
+            //makes sure not to cause an out-of-bounds error if connector
+            //is the last vector in commands
+            if(i == commands.size() -1)
+            {
+                break;
+            }
             //Gets vector<string> to the right
             //Does not take the actual sign 
             args.push_back(new Semicolon_Connector(1, commands.at(i + 1)));
            // args.push_back(obj);
         } 
         else if(commands.at(i).at(0) == "&&")
-        { 
+        {
+            if(i == commands.size() - 1)
+            {
+               break;
+            } 
             //Sets bool to false, so it does not run w/o checking
             args.push_back(new AND_Connector(0, commands.at(i + 1) )); 
             //args.push_back(obj); 
         }
         else if(commands.at(i).at(0) == "||")
         {
+            if(i == commands.size() -1)
+            {
+                break;
+            }
             //Sets bool to true, so it does not run w/o checking   
             args.push_back(new OR_Connector (1, commands.at(i + 1) ));
             //args.push_back(obj);  
         }
     }    
     
+    int j = 0;
     //Executes each command
-    for(unsigned int i = 0; i < args.size(); i++)
+    for(unsigned int i = 0; i < args.size()-1; i++)
     {
+        j++;
         //Dynamically calls appropriate execute() function
         args.at(i)->execute();
         //Variable holds whether the current command failed or succeeded
-        bool prev = args.at(i)->get_prevstate(); 
+        bool prev = args.at(i)->get_prevstate();
         //Changes next command's bool to prev
-        args.at(i + 1)->set_prevstate(prev); 
-    }  
+        args.at(i + 1)->set_prevstate(prev);
+    }
+    // gets rid of out-of-bounds error
+    args.at(j)->execute();
 
     //Deallocates objects and removes pointers
     for(unsigned int i = 0; i < args.size(); i++)
@@ -115,7 +141,6 @@ int main()
         delete args[i]; 
     } 
     args.clear();
-
     return 0; 
 }     
 

@@ -3,7 +3,8 @@
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/wait.h> 
-#include <stdio.h> 
+#include <stdio.h>
+#include <cstdlib>
 
 using namespace std; 
 class ABC //Abstract Base Class
@@ -55,6 +56,8 @@ class Semicolon_Connector: public Connectors
         } 
         virtual void execute() 
         {
+            
+
             //Always executes, no matter if the previous 
             //command failed or passed
             pid_t c_pid = fork(); //Child's process ID
@@ -115,6 +118,13 @@ class AND_Connector: public Connectors
         }
         virtual void execute()
         {
+             string exitcheck = "exit";
+            if(argv[0] == exitcheck.c_str())
+            {
+                exit(1);
+            }
+
+
             if(get_prevstate() == 0)
                 return; 
             else
@@ -176,6 +186,13 @@ class OR_Connector: public Connectors
         } 
         virtual void execute()
         {
+           string exitcheck = "exit";
+            if(argv[0] == exitcheck.c_str())
+            {
+                exit(1);
+            }
+
+
             if(get_prevstate() == 1)
             {
                 return;
