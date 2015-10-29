@@ -1,11 +1,6 @@
 // Melissa Castillo, mcast052 
 // Jeremy Chan, jchan107
 // CS100 ASSIGNMENT 1, main.cpp 
-<<<<<<< HEAD
-// 10/25/2015
-=======
-
->>>>>>> 1fa9cef9c546f791c0adc4485241f0564b026914
 #include <iostream> 
 #include <boost/tokenizer.hpp> 
 #include <string>
@@ -69,9 +64,6 @@ int main()
         }
         cout << endl;
     }  
-    string line; 
-    getline(cin, line); 
-    tokenizer<> tok(line);
     
     //Vector that will hold objects of our class
     vector<Connectors *> args;   
@@ -81,20 +73,6 @@ int main()
         //SPECIAL CASE: First command is always run
         if(i == 0) 
         {
-            arr[i + 1] = NULL; //adds NULL to the end of array
-            if(*it == ";") 
-            {
-                Semicolon S(1, args); 
-                v.pushback(S);    
-            }
-            else if(*it == "&&")
-            {
-                AND A(1, args);
-                v.pushback(A);   
-            }
-            else
-            {
-                OR O(1
             //Sets bool to true, command always run
             args.push_back(new Semicolon_Connector(1, commands.at(i) )); 
             //args.push_back(obj);
@@ -136,6 +114,8 @@ int main()
     { 
         delete args[i]; 
     } 
-    args.clear();     
+    args.clear();
+
+    return 0;     
 }
 
