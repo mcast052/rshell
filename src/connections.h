@@ -118,7 +118,7 @@ class AND_Connector: public Connectors
             if(get_prevstate() == 0)
                 return; 
             else
-           {
+            {
                pid_t c_pid = fork(); //Child's process ID
                pid_t pid; //Parent's process ID  
                int status; //Will indicate the status of the child process 
@@ -151,7 +151,8 @@ class AND_Connector: public Connectors
                    set_prevstate(1); 
                    return; 
                    //return 1 == Coommand has been executed
-           }                 
+               }                 
+            }
         }
 }; 
 
@@ -176,7 +177,9 @@ class OR_Connector: public Connectors
         virtual void execute()
         {
             if(get_prevstate() == 1)
-                return; 
+            {
+                return;
+            } 
             else
             { 
                 //Execute command (only when previous command fails
