@@ -5,7 +5,7 @@
 #include <iostream> 
 #include <boost/tokenizer.hpp> 
 #include <string>
-#include <"connections.h"> 
+#include "connections.h" 
 using namespace std;
 using namespace boost;
 
@@ -76,22 +76,26 @@ int main()
         {
             //Sets bool to true, command always run
             new Semicolon obj(1, commands.at(i) ); 
+            args.push_back(obj); 
         }
         else if(commands.at(i).at(0) == ";") 
         {
             //Gets vector<string> to the right
             //Does not take the actual sign 
             new Semicolon obj(1, commands.at(i + 1);
+            args.push_back(obj);
         } 
         else if(commands.at(i).at(0) == "&&")
         { 
             //Sets bool to false, so it does not run w/o checking
             new AND obj(0, commands.at(i + 1) ); 
+            args.push_back(obj); 
         }
         else if(commands.at(i).at(0) == "||")
         {
             //Sets bool to true, so it does not run w/o checking   
-            new OR obj(1, commands.at(i + 1) ); 
+            new OR obj(1, commands.at(i + 1) );
+            args.push_back(obj);  
         }
     }    
     
@@ -99,11 +103,11 @@ int main()
     for(unsigned int i = 0; i < args.size(); i++)
     {
         //Dynamically calls appropriate execute() function
-        args.at(i).exectute();
+        args.at(i)->execute();
         //Variable holds whether the current command failed or succeeded
-        bool prev = args.at(i).check_prevstate(); 
+        bool prev = args.at(i)->get_prevstate(); 
         //Changes next command's bool to prev
-        args.at(i + 1).set_prevstate(prev); 
+        args.at(i + 1)->set_prevstate(prev); 
     }  
 
     //Deallocates objects and removes pointers
