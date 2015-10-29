@@ -8,7 +8,9 @@
 using namespace std; 
 class ABC //Abstract Base Class
 {
-    public: 
+    public:
+        virtual ~ABC()
+        {} 
         virtual void execute() = 0; //pure virtual function
 };
 
@@ -35,7 +37,7 @@ class Connectors: public ABC
 class Semicolon_Connector: public Connectors
 {
     private: 
-        char * argv[25];
+        const char * argv[25];
            
     public:         
         Semicolon_Connector(bool prev, const vector<string> &args)
@@ -68,7 +70,7 @@ class Semicolon_Connector: public Connectors
             else if(c_pid == 0) 
             {
                //If fork() == 0, this fork is the child process
-               execvp(argv[0], argv); 
+               execvp(argv[0], const_cast<char* const*>(argv)); 
                perror("execvp failed in child");
                //execvp, if successful, never returns
                set_prevstate(0); 
@@ -96,7 +98,7 @@ class Semicolon_Connector: public Connectors
 class AND_Connector: public Connectors
 {
     private: 
-        char * argv[];
+        const char * argv[25];
 
     public:
         AND_Connector(bool prev, const vector<string> & args)
@@ -130,7 +132,7 @@ class AND_Connector: public Connectors
                else if(c_pid == 0) 
                {
                    //If fork() == 0, this fork is the child process
-                   execvp(argv[0], argv); 
+                   execvp(argv[0], const_cast<char * const *>(argv)); 
                    perror("execvp failed in child");
                    set_prevstate(0); 
                    //execvp, if successful, never returns
@@ -191,7 +193,7 @@ class OR_Connector: public Connectors
                 else if(c_pid == 0) 
                 {
                     //If fork() == 0, this fork is the child process
-                    execvp(argv[0], argv); 
+                    execvp(argv[0], const_cast<char * const *>(argv)); 
                     perror("execvp failed in child");
                     set_prevstate(0); 
                     //execvp, if successful, never returns
