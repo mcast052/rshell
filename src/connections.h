@@ -12,7 +12,7 @@ class ABC //Abstract Base Class
         virtual void execute() = 0; //pure virtual function
 };
 
-class Connectors: private ABC
+class Connectors: public ABC
 {
     private:
         bool prevstate;  
@@ -32,20 +32,22 @@ class Connectors: private ABC
 }; 
 
 
-class Semicolon: private Connectors
+class Semicolon_Connector: public Connectors
 {
     private: 
-        char * argv[];
-    
+        char * argv[25];
+           
     public:         
-        Semicolon(bool prev, const vector<string> &args)
+        Semicolon_Connector(bool prev, const vector<string> &args)
         {
             set_prevstate(prev);
+                
             unsigned int i = 0; 
             for(i = 0; i < args.size(); i++)
             {
-               string cmd = args.at(i); 
-               argv[i] = cmd; 
+               //string cmd = args.at(i);
+               argv[i] = args.at(i).c_str();
+               //argv[i] = &cmd[i];  
             }
             argv[i] = NULL;  
         } 
@@ -74,7 +76,7 @@ class Semicolon: private Connectors
             } 
             else 
             {
-                if( (pid = waitpid(c_pid, &status, 0) < 0) 
+                if( (pid = waitpid(c_pid, &status, 0)) < 0) 
                 { 
                     perror("ERROR");
                     //if waitpid returns -1, there was an ERROR 
@@ -91,19 +93,21 @@ class Semicolon: private Connectors
 
 };
 
-class AND: private Connectors
+class AND_Connector: public Connectors
 {
     private: 
-        char * argv[100];
+        char * argv[];
 
     public:
-        AND(bool prev, const vector<string> & args)
+        AND_Connector(bool prev, const vector<string> & args)
         {
             set_prevstate(prev);
-            unsigned int i = 0;  
+            unsigned int i = 0;   
             for(i = 0; i < args.size(); i++)
             {
-               argv[i] = args.at(i); 
+               argv[i] = args.at(i).c_str();
+               //string cmd = args.at(i); 
+               //argv[i] = &args[i];  
             }
             argv[i] = NULL;  
         }
@@ -133,7 +137,7 @@ class AND: private Connectors
                } 
                else 
                {
-                   if(pid = waitpid(c_pid, &status, 0) < 0) 
+                   if((pid = waitpid(c_pid, &status, 0)) < 0) 
                    { 
                        perror("ERROR");
                        //if waitpid returns -1, there was an ERROR 
@@ -149,19 +153,21 @@ class AND: private Connectors
         }
 }; 
 
-class OR: private Connectors
+class OR_Connector: public Connectors
 {
     private: 
-        char * argv[100]; 
+        const char * argv[25]; 
 
     public:
-        OR(bool prev, const vector<string> &args)
+        OR_Connector(bool prev, const vector<string> &args)
         {
             Connectors::set_prevstate(prev);
             unsigned int i = 0;  
             for(i = 0; i < args.size(); i++)
             {
-               argv[i] = args.at(i); 
+              argv[i] = args.at(i).c_str(); 
+              //string cmd = args.at(i); 
+              //argv[i] = &args[i]; 
             }
             argv[i] = NULL;  
         } 
@@ -192,7 +198,7 @@ class OR: private Connectors
                 } 
                 else 
                 {
-                    if(pid = waitpid(c_pid, &status, 0) < 0) 
+                    if((pid = waitpid(c_pid, &status, 0)) < 0) 
                     { 
                         perror("ERROR");
                         //if waitpid returns -1, there was an ERROR 
