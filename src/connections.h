@@ -3,10 +3,16 @@
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/wait.h> 
+#include <stdio.h> 
 
 using namespace std; 
+class ABC //Abstract Base Class
+{
+    public: 
+        virtual void execute() = 0; //pure virtual function
+};
 
-class Connectors
+class Connectors: private ABC
 {
     private:
         bool prevstate;  
@@ -20,30 +26,32 @@ class Connectors
         {
             return prevstate;
         }
-        void bool execute() = 0; //Pure virtual function
-};
+        virtual void execute() 
+        {}
+
+}; 
 
 
 class Semicolon: private Connectors
 {
     private: 
-        char argv[];        
-        Semicolon()
-        {
-            Connectors::set_prevstate(1); 
-        }
+        char * argv[];
+    
+    public:         
         Semicolon(bool prev, const vector<string> &args)
         {
-            Connectors::set_prevstate(prev);
-            for(unsigned int i = 0; i < args.size(); i++)
+            set_prevstate(prev);
+            unsigned int i = 0; 
+            for(i = 0; i < args.size(); i++)
             {
-               argv[i] = args.at(i); 
+               string cmd = args.at(i); 
+               argv[i] = cmd; 
             }
             argv[i] = NULL;  
-        }
+        } 
         virtual void execute() 
         {
-            //Always executres, no matter if the previous 
+            //Always executes, no matter if the previous 
             //command failed or passed
             pid_t c_pid = fork(); //Child's process ID
             pid_t pid; //Parent's process ID  
@@ -52,7 +60,8 @@ class Semicolon: private Connectors
             if(c_pid < 0) 
             {
                perror("Forking failed"); 
-               exit(1); 
+               set_prevstate(0);
+               return;  
             }
             else if(c_pid == 0) 
             {
@@ -60,42 +69,39 @@ class Semicolon: private Connectors
                execvp(argv[0], argv); 
                perror("execvp failed in child");
                //execvp, if successful, never returns
+               set_prevstate(0); 
+               return; 
             } 
             else 
             {
-                if( (pid = waitpid(c_pid,&status) < 0) 
+                if( (pid = waitpid(c_pid, &status, 0) < 0) 
                 { 
                     perror("ERROR");
                     //if waitpid returns -1, there was an ERROR 
-                    exit(1); 
+                    set_prevstate(0); 
+                    return; 
                 }
                 //else, child process if finished and the parent can continue
                 //the rest of its process. 
-                Connectors::set_prevstate(1); 
+                set_prevstate(1); 
                 return; 
                //return 1 == Coommand has been executed
             }
          } 
 
-               //If fork > 0, this fork is the parent process 
-            }
-        }
 };
 
 class AND: private Connectors
 {
     private: 
-        char argv[];
+        char * argv[100];
 
-    public: 
-        AND()
-        {
-            Connectors::set_prevstate(1); 
-        }
+    public:
         AND(bool prev, const vector<string> & args)
         {
-            Connectors::set_prevstate(prev); 
-            for(unsigned int i = 0; i < args.size(); i++)
+            set_prevstate(prev);
+            unsigned int i = 0;  
+            for(i = 0; i < args.size(); i++)
             {
                argv[i] = args.at(i); 
             }
@@ -103,38 +109,103 @@ class AND: private Connectors
         }
         virtual void execute()
         {
-            if(Connectors::get_prevstate() == 0)
+            if(get_prevstate() == 0)
                 return; 
             else
-                //Execute command (only does when previous command succeeded)
+           {
+               pid_t c_pid = fork(); //Child's process ID
+               pid_t pid; //Parent's process ID  
+               int status; //Will indicate the status of the child process 
+            
+               if(c_pid < 0) 
+               {
+                   perror("Forking failed");
+                   set_prevstate(0);    
+                   return; 
+                }   
+               else if(c_pid == 0) 
+               {
+                   //If fork() == 0, this fork is the child process
+                   execvp(argv[0], argv); 
+                   perror("execvp failed in child");
+                   set_prevstate(0); 
+                   //execvp, if successful, never returns
+               } 
+               else 
+               {
+                   if(pid = waitpid(c_pid, &status, 0) < 0) 
+                   { 
+                       perror("ERROR");
+                       //if waitpid returns -1, there was an ERROR 
+                       set_prevstate(0);
+                       return;  
+                   }
+                   //else, child process if finished and the parent can continue
+                   //the rest of its process. 
+                   set_prevstate(1); 
+                   return; 
+                   //return 1 == Coommand has been executed
+           }                 
         }
 }; 
 
 class OR: private Connectors
 {
     private: 
-        char argv[]; 
+        char * argv[100]; 
 
-    public: 
-        OR()
-        {
-            Connectors::set_prevstate(1); 
-        }
+    public:
         OR(bool prev, const vector<string> &args)
         {
-            Connectors::set_prevstate(prev); 
-            for(unsigned int i = 0; i < args.size(); i++)
+            Connectors::set_prevstate(prev);
+            unsigned int i = 0;  
+            for(i = 0; i < args.size(); i++)
             {
                argv[i] = args.at(i); 
             }
             argv[i] = NULL;  
- 
-        }
+        } 
         virtual void execute()
         {
-            if(Connectors::get_prevstate() == 1)
+            if(get_prevstate() == 1)
                 return; 
-            else 
+            else
+            { 
                 //Execute command (only when previous command fails
+                pid_t c_pid = fork(); //Child's process ID
+                pid_t pid; //Parent's process ID  
+                int status; //Will indicate the status of the child process 
+            
+                if(c_pid < 0) 
+                {
+                    perror("Forking failed");
+                    set_prevstate(0);    
+                    return; 
+                }   
+                else if(c_pid == 0) 
+                {
+                    //If fork() == 0, this fork is the child process
+                    execvp(argv[0], argv); 
+                    perror("execvp failed in child");
+                    set_prevstate(0); 
+                    //execvp, if successful, never returns
+                } 
+                else 
+                {
+                    if(pid = waitpid(c_pid, &status, 0) < 0) 
+                    { 
+                        perror("ERROR");
+                        //if waitpid returns -1, there was an ERROR 
+                        set_prevstate(0);
+                        return;  
+                    }
+                    //else, child process if finished and the parent can continue
+                    //the rest of its process. 
+                    set_prevstate(1); 
+                    return; 
+                    //return 1 == Coommand has been executed
+                } 
+            }
+
         }
 };

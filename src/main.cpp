@@ -1,9 +1,15 @@
-// Melissa Castillo 
+// Melissa Castillo, mcast052 
+// Jeremy Chan, jchan107
 // CS100 ASSIGNMENT 1, main.cpp 
+<<<<<<< HEAD
 // 10/25/2015
+=======
+
+>>>>>>> 1fa9cef9c546f791c0adc4485241f0564b026914
 #include <iostream> 
 #include <boost/tokenizer.hpp> 
 #include <string>
+#include <"connections.h"> 
 using namespace std;
 using namespace boost;
 
@@ -62,24 +68,18 @@ int main()
             cout << commands.at(i).at(j)<< " ";
         }
         cout << endl;
-    }
-#include "connectors.h" 
-
-using namespace std; 
-using namespace boost;  
-int main(int argc, char* argv[])
-{
+    }  
     string line; 
     getline(cin, line); 
-    tokenizer<> tok(line);     
+    tokenizer<> tok(line);
     
-    vector<Connectors *> v; 
-    tokenizer::iterator it; 
-    char args[100]; 
-    int i = 0; 
-    for(it = tok.begin(); it != tok.end(); it++)
-    {   
-        if(*it == ";" || *it == "&&" || *it == "||")
+    //Vector that will hold objects of our class
+    vector<Connectors *> args;   
+    for(unsigned int i = 0; i < commands.size(); i++) 
+    //Traverses through outer vector 
+    {
+        //SPECIAL CASE: First command is always run
+        if(i == 0) 
         {
             arr[i + 1] = NULL; //adds NULL to the end of array
             if(*it == ";") 
@@ -95,3 +95,42 @@ int main(int argc, char* argv[])
             else
             {
                 OR O(1
+            //Sets bool to true, command always run
+            new Semicolon obj(1, commands.at(i) ); 
+        }
+        else if(commands.at(i).at(0) == ";") 
+        {
+            //Gets vector<string> to the right
+            //Does not take the actual sign 
+            new Semicolon obj(1, commands.at(i + 1);
+        } 
+        else if(commands.at(i).at(0) == "&&")
+        { 
+            //Sets bool to false, so it does not run w/o checking
+            new AND obj(0, commands.at(i + 1) ); 
+        }
+        else if(commands.at(i).at(0) == "||")
+        {
+            //Sets bool to true, so it does not run w/o checking   
+            new OR obj(1, commands.at(i + 1) ); 
+        }
+    }    
+    
+    //Executes each command
+    for(unsigned int i = 0; i < args.size(); i++)
+    {
+        //Dynamically calls appropriate execute() function
+        args.at(i).exectute();
+        //Variable holds whether the current command failed or succeeded
+        bool prev = args.at(i).check_prevstate(); 
+        //Changes next command's bool to prev
+        args.at(i + 1).set_prevstate(prev); 
+    }  
+
+    //Deallocates objects and removes pointers
+    for(unsigned int i = 0; i < args.size(); i++)
+    { 
+        delete args[i]; 
+    } 
+    args.clear();     
+}
