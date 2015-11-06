@@ -75,56 +75,35 @@ int main()
     
     //Vector that will hold objects of our class
     vector<Connectors *> args;   
-    for(unsigned int i = 0; i < commands.size(); i++) 
+    for(unsigned int i = 0; i < commands.size() - 1; i++) 
     //Traverses through outer vector 
     {
         //SPECIAL CASE: First command is always run
         if(i == 0) 
         {
-            //Sets bool to true, command always run
-            args.push_back(new Semicolon_Connector(1, commands.at(i) )); 
+            args.push_back(new Semicolon_Connector(0, commands.at(i) )); 
             //args.push_back(obj);
         }
         else if(commands.at(i).at(0) == ";") 
         {
-            //makes sure not to cause an out-of-bounds error if connector
-            //is the last vector in commands
-            if(i == commands.size() -1)
-            {
-                break;
-            }
             //Gets vector<string> to the right
             //Does not take the actual sign 
-            args.push_back(new Semicolon_Connector(1, commands.at(i + 1)));
-           // args.push_back(obj);
+            args.push_back(new Semicolon_Connector(0, commands.at(i + 1)));
         } 
         else if(commands.at(i).at(0) == "&&")
-        {
-            if(i == commands.size() - 1)
-            {
-               break;
-            } 
-            //Sets bool to false, so it does not run w/o checking
-            args.push_back(new AND_Connector(0, commands.at(i + 1) )); 
-            //args.push_back(obj); 
+        { 
+            args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
         }
         else if(commands.at(i).at(0) == "||")
         {
-            if(i == commands.size() -1)
-            {
-                break;
-            }
-            //Sets bool to true, so it does not run w/o checking   
-            args.push_back(new OR_Connector (1, commands.at(i + 1) ));
-            //args.push_back(obj);  
+            args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
         }
     }    
     
-    int j = 0;
+    unsigned int i = 0; 
     //Executes each command
-    for(unsigned int i = 0; i < args.size()-1; i++)
+    for(i = 0; i < args.size()-1; i++)
     {
-        j++;
         //Dynamically calls appropriate execute() function
         args.at(i)->execute();
         //Variable holds whether the current command failed or succeeded
@@ -133,7 +112,7 @@ int main()
         args.at(i + 1)->set_prevstate(prev);
     }
     // gets rid of out-of-bounds error
-    args.at(j)->execute();
+    args.at(i)->execute();
 
     //Deallocates objects and removes pointers
     for(unsigned int i = 0; i < args.size(); i++)
