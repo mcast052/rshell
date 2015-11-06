@@ -1,3 +1,7 @@
+Melissa Castillo
+
+Jeremy Chan
+
 RSHELL
 ======
 By: Melissa Castillo [mcast052] (https://github.com/mcast052), Jeremy Chan [jchan107] (https://github.com/jchan107)
