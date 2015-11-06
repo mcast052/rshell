@@ -1,4 +1,10 @@
-all: 
-	g++ -Wall -Werror -ansi -pedantic src/main.cpp src/connections.h
-rshell:
-	g++ -Wall -Werror -ansi -pedantic src/main.cpp src/connections.h
+all: src/connections.h 
+	g++ -Wall -Werror -ansi -pedantic src/main.cpp -o rshell
+	mkdir bin
+	mv rshell bin
+rshell: src/connections.h
+	g++ -Wall -Werror -ansi -pedantic src/main.cpp -o rshell
+	mkdir bin 
+	mv rshell bin
+clean: 
+	rm -r bin	
