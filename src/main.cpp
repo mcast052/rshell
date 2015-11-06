@@ -74,10 +74,11 @@ int main()
     }  
     
     //Vector that will hold objects of our class
-    vector<Connectors *> args;   
-    for(unsigned int i = 0; i < commands.size() - 1; i++) 
+    vector<Connectors *> args; 
+    unsigned int j = commands.size() - 1;   
+    for(unsigned int i = 0; i < commands.size(); i++) 
     //Traverses through outer vector 
-    {
+    { 
         //SPECIAL CASE: First command is always run
         if(i == 0) 
         {
@@ -86,16 +87,28 @@ int main()
         }
         else if(commands.at(i).at(0) == ";") 
         {
+            if(i == j)
+            {
+               break;
+            } 
             //Gets vector<string> to the right
             //Does not take the actual sign 
             args.push_back(new Semicolon_Connector(0, commands.at(i + 1)));
         } 
         else if(commands.at(i).at(0) == "&&")
         { 
+            if(i == j) 
+            {
+                break; 
+            }
             args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
         }
         else if(commands.at(i).at(0) == "||")
         {
+            if(i == j) 
+            {
+                break; 
+            }
             args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
         }
     }    
