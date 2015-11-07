@@ -4,6 +4,7 @@
 #include <iostream> 
 #include <boost/tokenizer.hpp> 
 #include <string>
+#include <stdio.h>
 #include "connections.h" 
 
 int main()
@@ -21,7 +22,7 @@ int main()
         {
             //parses
             typedef tokenizer<char_separator<char> > tokenizer;
-            char_separator<char> sep(" $", "; #");
+            char_separator<char> sep(" $", ";#");
             tokenizer tkn(tkn_check,sep);
 
             //Shows where it is parsed
@@ -49,7 +50,10 @@ int main()
                 }
                 if(*iter2 == ";" || *iter2 == "||" || *iter2 == "&&")
                 {
-                    commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                    if(indivCommand.size() != 0)
+                    {
+                         commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                    }
                     indivCommand.clear(); // clears vector holding list of commands
                     indivCommand.push_back(*iter2); // holds only the connector now
                     commands.push_back(indivCommand); // pushes single connector into commands
@@ -80,12 +84,32 @@ int main()
 
             //Vector that will hold objects of our class
             vector<Connectors *> args; 
-            unsigned int j = commands.size() - 1;   
+            unsigned int j = commands.size() - 1;  
+            bool connectorFront = false; 
             for(unsigned int i = 0; i < commands.size(); i++) 
                 //Traverses through outer vector 
             { 
+                if(i == 0 && commands.at(i).at(0) == ";") 
+                {
+                    perror("Syntax error near unexpected token ';'");
+                    connectorFront = true;
+                    break; 
+                }
+                else if(i == 0 && commands.at(i).at(0) == "||") 
+                {
+                    perror("Syntax error near unexpected token \"||\""); 
+                    connectorFront = true;
+                    break;
+                }
+                else if(i == 0 && commands.at(i).at(0) == "&&") 
+                {
+                    perror("Syntax error near unexpected token \"&&\""); 
+                    connectorFront = true;
+                    break;
+                }
+
                 //SPECIAL CASE: First command is always run
-                if(i == 0) 
+                else if(i == 0) 
                 {
                     args.push_back(new Semicolon_Connector(0, commands.at(i) )); 
                     //args.push_back(obj);
@@ -118,35 +142,38 @@ int main()
                 }
             }    
 
-            unsigned int i = 0;  
-            //Executes each command
-            for(i = 0; i < args.size()-1; i++)
+            if(connectorFront == false)
             {
-                //Dynamically calls appropriate execute() function
-                args.at(i)->execute();
-                //Variable holds whether the current command failed or succeeded
-                bool prev = args.at(i)->get_prevstate();
-                //Changes next command's bool to prev
-                args.at(i + 1)->set_prevstate(prev);
-                exitcheck = args.at(i)->get_exit(); 
-                if(exitcheck)
-                { 
-                    break;
-                }  
-            }
+                unsigned int i = 0;  
+                //Executes each command
+                for(i = 0; i < args.size()-1; i++)
+                {
+                    //Dynamically calls appropriate execute() function
+                    args.at(i)->execute();
+                    //Variable holds whether the current command failed or succeeded
+                    bool prev = args.at(i)->get_prevstate();
+                    //Changes next command's bool to prev
+                    args.at(i + 1)->set_prevstate(prev);
+                    exitcheck = args.at(i)->get_exit(); 
+                    if(exitcheck)
+                    { 
+                        break;
+                    }  
+                }
             // gets rid of out-of-bounds error
-            args.at(i)->execute();
-            if(!exitcheck)
-            {
-                exitcheck = args.at(i)->get_exit(); 
-            }
+                args.at(i)->execute();
+                if(!exitcheck)
+                {
+                    exitcheck = args.at(i)->get_exit(); 
+                }
 
             //Deallocates objects and removes pointers
-            for(unsigned int i = 0; i < args.size(); i++)
-            { 
-                delete args[i]; 
-            } 
-            args.clear();
+                for(unsigned int i = 0; i < args.size(); i++)
+                { 
+                    delete args[i]; 
+                } 
+                args.clear();
+            }
         }
     } while(!exitcheck); 
     return 0; 
