@@ -166,6 +166,17 @@ int main()
                     }
                     else// only in use for connector: ;
                     {
+                        tokenizer::iterator iter3 = iter2;
+                        iter2++;
+                        if(iter3 != tkn.end())
+                        {
+                            if(*iter3 == ";")
+                            {
+                                perror("Syntax error at ';;'");
+                                error = true;
+                                break;
+                            }
+                        }
                         if(indivCommand.size() != 0)
                         {
                              commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
