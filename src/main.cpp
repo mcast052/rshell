@@ -247,6 +247,8 @@ int main()
                     {
                         if(i == j)
                         {
+                            perror("Syntax error");
+                            error  = true;
                             break;
                         } 
                         //Gets vector<string> to the right
@@ -257,7 +259,10 @@ int main()
                     { 
                         if(i == j) 
                         {
-                                break; 
+                            
+                            perror("Syntax error");
+                            error = true;
+                            break; 
                         }
                         args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
                     }
@@ -265,6 +270,8 @@ int main()
                     {
                         if(i == j) 
                         {
+                            perror("Syntax error");
+                            error = true;
                             break; 
                         }
                         args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
@@ -296,6 +303,7 @@ int main()
                 {
                     exitcheck = args.at(i)->get_exit(); 
                 }
+             }
 
             //Deallocates objects and removes pointers
                 for(unsigned int i = 0; i < args.size(); i++)
@@ -303,7 +311,7 @@ int main()
                     delete args[i]; 
                 } 
                 args.clear();
-            }
+            
         }
     } while(!exitcheck); 
     return 0; 
