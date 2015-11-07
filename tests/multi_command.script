@@ -1,0 +1,33 @@
+Script started on Fri 06 Nov 2015 10:24:02 PM PST
+]0;mcast052@hammer:~/CS100/Assignment1/rshell[?1034h[mcast052@hammer rshell]$ bin/rshell
+mcast052@hammer.cs.ucr.edu$ ls; echoo h    hello world! && mkdir google && ls -a
+bin  LICENSE  Makefile	multi_command.script  README.md  src  tests
+hello world!
+.  ..  bin  .git  google  LICENSE  Makefile  multi_command.script  README.md  src  tests
+mcast052@hammer.cs.ucr.edu$ ;; echo hello
+Syntax error at ';;'
+mcast052@hammer.cs.ucr.edu$ echo will this work &&
+Syntax error
+mcast052@hammer.cs.ucr.edu$ echo this should not work &&& cal || poop; 
+Syntax error at '&&&'
+mcast052@hammer.cs.ucr.edu$ ls; 
+Syntax error
+mcast052@hammer.cs.ucr.edu$ echo hellol ; mkdir google || rmdir google && ls -a; poop && echo don't run || echo run
+hello
+mkdir: cannot create directory `google': File exists
+.  ..  bin  .git  LICENSE  Makefile  multi_command.script  README.md  src  tests
+execvp failed in child: No such file or directory
+run
+mcast052@hammer.cs.ucr.edu$ ls -a ||  & echo
+Syntax error at '&'
+mcast052@hammer.cs.ucr.edu$ echo &&	ls -a
+
+execvp failed in child: No such file or directory
+mcast052@hammer.cs.ucr.edu$        
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  vector::_M_range_check
+Aborted
+]0;mcast052@hammer:~/CS100/Assignment1/rshell[mcast052@hammer rshell]$ exit
+exit
+
+Script done on Fri 06 Nov 2015 10:28:04 PM PST
