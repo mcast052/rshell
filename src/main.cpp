@@ -5,6 +5,7 @@
 #include <boost/tokenizer.hpp> 
 #include <string>
 #include <stdio.h>
+#include <iterator>
 #include "connections.h" 
 
 int main()
@@ -22,8 +23,9 @@ int main()
         {
             //parses
             typedef tokenizer<char_separator<char> > tokenizer;
-            char_separator<char> sep(" $", ";#");
+            char_separator<char> sep(" $", ";#|&");
             tokenizer tkn(tkn_check,sep);
+            bool error = false;
 
             //Shows where it is parsed
 
@@ -48,16 +50,131 @@ int main()
                     ifHash = true;
                     break;
                 }
-                if(*iter2 == ";" || *iter2 == "||" || *iter2 == "&&")
+                if(*iter2 == ";" || *iter2 == "|" || *iter2 == "&")
                 {
-                    if(indivCommand.size() != 0)
+                    if(*iter2 == "|" || *iter2 == "&")
                     {
-                         commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                        tokenizer::iterator iter3 = iter2;
+                        iter3++;
+                        if(iter3 == tkn.end())//if & or | is at the end it will make an error
+                        {
+                            perror("Syntax error");
+                            error = true;
+                            break;
+                        }
+                        else
+                        {
+                            if(*iter2 == "|")//now checks to see if connector is | or &
+                            {
+                                if(*iter3 == "|")//checks if connector is || and if it is then you need another iterator to see next string val
+                                {
+                                    tokenizer::iterator iter4 = iter3;
+                                    iter4++;
+                                    if(iter4 == tkn.end())//if this iterator is at the end that means the connector at the end is: ||(which is okay)
+                                    {
+                                        if(indivCommand.size() != 0)
+                                        {
+                                            commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                        }
+                                        indivCommand.clear(); // clears vector holding list of commands
+                                        string tempConnector = *iter2 + *iter3;
+                                        indivCommand.push_back(tempConnector);
+                                        commands.push_back(indivCommand); // pushes single connector into commands
+                                        indivCommand.clear(); // clears vector againv
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        if(*iter4 == "|")//if the connector goes to: ||| it returns an error
+                                        {
+                                            perror("Syntax error at '|||'");
+                                            error = true;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            if(indivCommand.size() != 0)//if connector is the right size then it just puts it into the vector
+                                            {
+                                                 commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                            }
+                                            indivCommand.clear(); // clears vector holding list of commands
+                                            string tempConnector = *iter2 + *iter3;
+                                            indivCommand.push_back(tempConnector);
+                                            commands.push_back(indivCommand); // pushes single connector into commands
+                                            indivCommand.clear(); // clears vector againv
+                                            iter2 = iter3;
+                                        }
+                                    }
+                                }
+                                else//if only one | then return error
+                                {
+                                    perror("Syntax error at '|'");
+                                    error = true;
+                                    break;
+                                }
+                            }
+                            else if(*iter2 == "&")
+                            {
+                                if(*iter3 == "&")
+                                {
+                                    tokenizer::iterator iter4 = iter3;
+                                    iter4++;
+                                    if(iter4 == tkn.end())
+                                    {
+                                        if(indivCommand.size() != 0)
+                                        {
+                                            commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                        }
+                                        indivCommand.clear(); // clears vector holding list of commands
+                                        string tempConnector = *iter2 + *iter3;
+                                        indivCommand.push_back(tempConnector);
+                                        commands.push_back(indivCommand); // pushes single connector into commands
+                                        indivCommand.clear();
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        if(*iter4 == "&")
+                                        {
+                                            perror("Syntax error at '&&&'");
+                                            error = true;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            if(indivCommand.size() != 0)
+                                            {
+                                                commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                            }
+                                            indivCommand.clear(); // clears vector holding list of commands
+                                            string tempConnector = *iter2 + *iter3;
+                                            indivCommand.push_back(tempConnector);
+                                            commands.push_back(indivCommand); // pushes single connector into commands
+                                            indivCommand.clear(); // clears vector againv
+                                            iter2 = iter3;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    perror("Syntax error at '&'");
+                                    error = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    indivCommand.clear(); // clears vector holding list of commands
-                    indivCommand.push_back(*iter2); // holds only the connector now
-                    commands.push_back(indivCommand); // pushes single connector into commands
-                    indivCommand.clear(); // clears vector again
+                    else// only in use for connector: ;
+                    {
+                        if(indivCommand.size() != 0)
+                        {
+                             commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                        }
+                        indivCommand.clear(); // clears vector holding list of commands
+                        indivCommand.push_back(*iter2); // holds only the connector now
+                        commands.push_back(indivCommand); // pushes single connector into commands
+                        indivCommand.clear(); // clears vector againv
+                    }
                 }
                 else
                 {
@@ -82,67 +199,69 @@ int main()
                 cout << endl;
             }  
 
-            //Vector that will hold objects of our class
-            vector<Connectors *> args; 
-            unsigned int j = commands.size() - 1;  
-            bool connectorFront = false; 
-            for(unsigned int i = 0; i < commands.size(); i++) 
-                //Traverses through outer vector 
-            { 
-                if(i == 0 && commands.at(i).at(0) == ";") 
-                {
-                    perror("Syntax error near unexpected token ';'");
-                    connectorFront = true;
-                    break; 
-                }
-                else if(i == 0 && commands.at(i).at(0) == "||") 
-                {
-                    perror("Syntax error near unexpected token \"||\""); 
-                    connectorFront = true;
-                    break;
-                }
-                else if(i == 0 && commands.at(i).at(0) == "&&") 
-                {
-                    perror("Syntax error near unexpected token \"&&\""); 
-                    connectorFront = true;
-                    break;
-                }
-
-                //SPECIAL CASE: First command is always run
-                else if(i == 0) 
-                {
-                    args.push_back(new Semicolon_Connector(0, commands.at(i) )); 
-                    //args.push_back(obj);
-                }
-                else if(commands.at(i).at(0) == ";") 
-                {
-                    if(i == j)
-                    {
-                        break;
-                    } 
-                    //Gets vector<string> to the right
-                    //Does not take the actual sign 
-                    args.push_back(new Semicolon_Connector(0, commands.at(i + 1)));
-                } 
-                else if(commands.at(i).at(0) == "&&")
+            vector<Connectors *> args;
+            if(error == false)
+            {
+                //Vector that will hold objects of our class
+                unsigned int j = commands.size() - 1;   
+                for(unsigned int i = 0; i < commands.size(); i++) 
+                    //Traverses through outer vector 
                 { 
-                    if(i == j) 
+                    if(i == 0 && commands.at(i).at(0) == ";") 
                     {
+                        perror("Syntax error near unexpected token ';'");
+                        error = true;
                         break; 
                     }
-                    args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
-                }
-                else if(commands.at(i).at(0) == "||")
-                {
-                    if(i == j) 
+                    else if(i == 0 && commands.at(i).at(0) == "||") 
                     {
-                        break; 
+                        perror("Syntax error near unexpected token \"||\""); 
+                        error = true;
+                        break;
                     }
-                    args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
+                    else if(i == 0 && commands.at(i).at(0) == "&&") 
+                   {
+                        perror("Syntax error near unexpected token \"&&\""); 
+                        error = true;
+                        break;
+                    }
+    
+                    //SPECIAL CASE: First command is always run
+                    else if(i == 0) 
+                    {
+                        args.push_back(new Semicolon_Connector(0, commands.at(i) )); 
+                        //args.push_back(obj);
+                    }
+                    else if(commands.at(i).at(0) == ";") 
+                    {
+                        if(i == j)
+                        {
+                            break;
+                        } 
+                        //Gets vector<string> to the right
+                        //Does not take the actual sign 
+                        args.push_back(new Semicolon_Connector(0, commands.at(i + 1)));
+                    } 
+                    else if(commands.at(i).at(0) == "&")
+                    { 
+                        if(i == j) 
+                        {
+                                break; 
+                        }
+                        args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
+                    }
+                    else if(commands.at(i).at(0) == "|")
+                    {
+                        if(i == j) 
+                        {
+                            break; 
+                        }
+                        args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
+                    }
                 }
             }    
 
-            if(connectorFront == false)
+            if(error == false)
             {
                 unsigned int i = 0;  
                 //Executes each command
