@@ -42,12 +42,12 @@ int main()
             bool error = false;
 
             //Shows where it is parsed
-
+            /*
             for(tokenizer::iterator iter = tkn.begin();iter != tkn.end();
                     ++iter)
             {
                 cout << *iter << endl;   
-            }
+            } */
 
             //puts the parsed values into vectors by  command and connectors
             vector< vector<string> > commands;
@@ -55,8 +55,7 @@ int main()
 
             tokenizer::iterator iter2;
             bool ifHash = false;
-            for(iter2 = tkn.begin();iter2 != tkn.end();
-                    ++iter2)
+            for(iter2 = tkn.begin();iter2 != tkn.end(); ++iter2)
             {
                 if(*iter2 == "#")
                 {
@@ -70,7 +69,9 @@ int main()
                     {
                         tokenizer::iterator iter3 = iter2;
                         iter3++;
-                        if(iter3 == tkn.end())//if & or | is at the end it will make an error
+                        
+                        //if & or | is at the end it will make an error
+                        if(iter3 == tkn.end())
                         {
                             cout << "Syntax error" << endl;
                             error = true;
@@ -78,28 +79,43 @@ int main()
                         }
                         else
                         {
-                            if(*iter2 == "|")//now checks to see if connector is | or &
+                            //now checks to see if connector is | or &
+                            if(*iter2 == "|")
                             {
-                                if(*iter3 == "|")//checks if connector is || and if it is then you need another iterator to see next string val
+                                //checks if connector is || 
+                                //and if it is then you need another 
+                                //iterator to see next string val
+                                if(*iter3 == "|")
                                 {
                                     tokenizer::iterator iter4 = iter3;
                                     iter4++;
-                                    if(iter4 == tkn.end())//if this iterator is at the end that means the connector at the end is: ||(which is okay)
+                                 
+                                    //if this iterator is at the end 
+                                    //that means the connector at the end is: 
+                                    //||(which is okay)
+                                    if(iter4 == tkn.end())
                                     {
                                         if(indivCommand.size() != 0)
                                         {
-                                            commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                            commands.push_back(indivCommand); 
+                                            //push into commands, 
+                                            //a vector holding list of commands 
+                                            //before connector
                                         }
-                                        indivCommand.clear(); // clears vector holding list of commands
+                                        indivCommand.clear(); 
                                         string tempConnector = *iter2 + *iter3;
                                         indivCommand.push_back(tempConnector);
-                                        commands.push_back(indivCommand); // pushes single connector into commands
-                                        indivCommand.clear(); // clears vector againv
+                                        commands.push_back(indivCommand); 
+                                        // pushes single connector into commands
+                                        indivCommand.clear(); 
+                                        // clears vector againv
                                         break;
                                     }
                                     else
                                     {
-                                        if(*iter4 == "|")//if the connector goes to: ||| it returns an error
+                                        //if the connector goes to: ||| 
+                                        //it returns an error
+                                        if(*iter4 == "|")
                                         {
                                             cout << "Syntax error at '|||'" << endl;
                                             error = true;
@@ -107,14 +123,21 @@ int main()
                                         }
                                         else
                                         {
-                                            if(indivCommand.size() != 0)//if connector is the right size then it just puts it into the vector
+                                            //if connector is the right size 
+                                            //then it just puts it into the vector
+                                            if(indivCommand.size() != 0)
                                             {
-                                                 commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                                 commands.push_back(indivCommand); 
+                                                 //push into commands, 
+                                                 //a vector holding list of 
+                                                 //commands before connector
                                             }
-                                            indivCommand.clear(); // clears vector holding list of commands
+                                            indivCommand.clear(); 
+                                            // clears vector holding list of commands
                                             string tempConnector = *iter2 + *iter3;
                                             indivCommand.push_back(tempConnector);
-                                            commands.push_back(indivCommand); // pushes single connector into commands
+                                            commands.push_back(indivCommand); 
+                                            // pushes single connector into commands
                                             indivCommand.clear(); // clears vector againv
                                             iter2 = iter3;
                                         }
@@ -137,12 +160,17 @@ int main()
                                     {
                                         if(indivCommand.size() != 0)
                                         {
-                                            commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                            commands.push_back(indivCommand); 
+                                            //push into commands, 
+                                            //a vector holding list of 
+                                            //commands before connector
                                         }
-                                        indivCommand.clear(); // clears vector holding list of commands
+                                        indivCommand.clear(); 
+                                        // clears vector holding list of commands
                                         string tempConnector = *iter2 + *iter3;
                                         indivCommand.push_back(tempConnector);
-                                        commands.push_back(indivCommand); // pushes single connector into commands
+                                        commands.push_back(indivCommand); 
+                                        // pushes single connector into commands
                                         indivCommand.clear();
                                         break;
                                     }
@@ -150,7 +178,7 @@ int main()
                                     {
                                         if(*iter4 == "&")
                                         {
-                                            perror("Syntax error at '&&&'");
+                                            cout << "Syntax error at '&&&'" << endl;
                                             error = true;
                                             break;
                                         }
@@ -158,13 +186,19 @@ int main()
                                         {
                                             if(indivCommand.size() != 0)
                                             {
-                                                commands.push_back(indivCommand); //push into commands, a vector holding list of commands before connector
+                                                commands.push_back(indivCommand); 
+                                                //push into commands, 
+                                                //a vector holding list of commands 
+                                                //before connector
                                             }
-                                            indivCommand.clear(); // clears vector holding list of commands
+                                            indivCommand.clear(); 
+                                            // clears vector holding list of commands
                                             string tempConnector = *iter2 + *iter3;
                                             indivCommand.push_back(tempConnector);
-                                            commands.push_back(indivCommand); // pushes single connector into commands
-                                            indivCommand.clear(); // clears vector againv
+                                            commands.push_back(indivCommand); 
+                                            // pushes single connector into commands
+                                            indivCommand.clear(); 
+                                            // clears vector againv
                                             iter2 = iter3;
                                         }
                                     }
@@ -181,12 +215,12 @@ int main()
                     else// only in use for connector: ;
                     {
                         tokenizer::iterator iter3 = iter2;
-                        iter2++;
+                        iter3++;
                         if(iter3 != tkn.end())
                         {
                             if(*iter3 == ";")
                             {
-                                perror("Syntax error at ';;'");
+                                cout << "Syntax error at ';;'" << endl;
                                 error = true;
                                 break;
                             }
@@ -213,7 +247,7 @@ int main()
             }
 
             //outputs the vector
-
+            /*
             for(unsigned int i = 0; i < commands.size(); i++)
             {
                 cout << "Command at vector " << i << " contains: " ;
@@ -223,7 +257,7 @@ int main()
                 }
                 cout << endl;
             }  
-
+            */
             vector<Connectors *> args;
             if(error == false)
             {
@@ -260,7 +294,7 @@ int main()
                     {
                         if(i == j)
                         {
-                            perror("Syntax error");
+                            cout << "Syntax error" << endl;
                             error  = true;
                             break;
                         } 
@@ -271,7 +305,7 @@ int main()
                         if(i == j) 
                         {
                             
-                            perror("Syntax error");
+                            cout << "Syntax error" << endl;
                             error = true;
                             break; 
                         }
@@ -281,7 +315,7 @@ int main()
                     {
                         if(i == j) 
                         {
-                            perror("Syntax error");
+                            cout << "Syntax error" << endl;
                             error = true;
                             break; 
                         }
