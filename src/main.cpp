@@ -59,9 +59,17 @@ int main()
             {
                 if(*iter2 == "#")
                 {
-                    commands.push_back(indivCommand); 
-                    ifHash = true;
-                    break;
+                    if(indivCommand.size() != 0)
+                    {
+                        commands.push_back(indivCommand); 
+                        ifHash = true;
+                        break;
+                    }
+                    else
+                    {
+                        ifHash = true;
+                        break;
+                    }
                 }
                 if(*iter2 == ";" || *iter2 == "|" || *iter2 == "&")
                 {
@@ -257,15 +265,15 @@ int main()
                 }
                 cout << endl;
             }  
-            */
+            */ 
             vector<Connectors *> args;
-            if(error == false)
+            if(error == false && commands.size() > 0)
             {
                 //Vector that will hold objects of our class
                 unsigned int j = commands.size() - 1;   
                 for(unsigned int i = 0; i < commands.size(); i++) 
                     //Traverses through outer vector 
-                { 
+                {
                     if(i == 0 && commands.at(i).at(0) == ";") 
                     {
                         cout << "Syntax error near unexpected token ';'" << endl;
@@ -324,7 +332,7 @@ int main()
                 }
             }    
 
-            if(error == false)
+            if(error == false && commands.size() > 0)
             {
                 unsigned int i = 0;  
                 //Executes each command
