@@ -16,7 +16,21 @@ int main()
     bool exitcheck = 0; 
     do
     {
-        cout <<"$ ";
+        char * name = getlogin(); 
+        if(name == NULL)
+        {
+            cout << "Retrieving username failed" << endl; 
+            exit (127); 
+        }
+        char hostname[1024]; 
+        hostname[1023] = '\0'; 
+        int hostcheck = gethostname(hostname, 2013); 
+        if(hostcheck == -1)
+        {
+            cout << "Retrieving host name failed" << endl; 
+            exit(127); 
+        }
+        cout << name << "@" << hostname << "$ ";
         string tkn_check;
         getline(cin,tkn_check);
         if(!tkn_check.empty())
@@ -58,7 +72,7 @@ int main()
                         iter3++;
                         if(iter3 == tkn.end())//if & or | is at the end it will make an error
                         {
-                            perror("Syntax error");
+                            cout << "Syntax error" << endl;
                             error = true;
                             break;
                         }
@@ -87,7 +101,7 @@ int main()
                                     {
                                         if(*iter4 == "|")//if the connector goes to: ||| it returns an error
                                         {
-                                            perror("Syntax error at '|||'");
+                                            cout << "Syntax error at '|||'" << endl;
                                             error = true;
                                             break;
                                         }
@@ -108,7 +122,7 @@ int main()
                                 }
                                 else//if only one | then return error
                                 {
-                                    perror("Syntax error at '|'");
+                                    cout << "Syntax error at '|'" << endl;
                                     error = true;
                                     break;
                                 }
@@ -157,7 +171,7 @@ int main()
                                 }
                                 else
                                 {
-                                    perror("Syntax error at '&'");
+                                    cout << "Syntax error at '&'" << endl;
                                     error = true;
                                     break;
                                 }
@@ -220,19 +234,19 @@ int main()
                 { 
                     if(i == 0 && commands.at(i).at(0) == ";") 
                     {
-                        perror("Syntax error near unexpected token ';'");
+                        cout << "Syntax error near unexpected token ';'" << endl;
                         error = true;
                         break; 
                     }
                     else if(i == 0 && commands.at(i).at(0) == "||") 
                     {
-                        perror("Syntax error near unexpected token \"||\""); 
+                        cout << "Syntax error near unexpected token \"||\"" << endl; 
                         error = true;
                         break;
                     }
                     else if(i == 0 && commands.at(i).at(0) == "&&") 
                    {
-                        perror("Syntax error near unexpected token \"&&\""); 
+                        cout << "Syntax error near unexpected token \"&&\"" << endl; 
                         error = true;
                         break;
                     }
@@ -241,7 +255,6 @@ int main()
                     else if(i == 0) 
                     {
                         args.push_back(new Semicolon_Connector(0, commands.at(i) )); 
-                        //args.push_back(obj);
                     }
                     else if(commands.at(i).at(0) == ";") 
                     {
@@ -251,11 +264,9 @@ int main()
                             error  = true;
                             break;
                         } 
-                        //Gets vector<string> to the right
-                        //Does not take the actual sign 
-                        args.push_back(new Semicolon_Connector(0, commands.at(i + 1)));
+                        args.push_back(new Semicolon_Connector(0, commands.at(i + 1))); 
                     } 
-                    else if(commands.at(i).at(0) == "&")
+                    else if(commands.at(i).at(0) == "&&")
                     { 
                         if(i == j) 
                         {
@@ -264,9 +275,9 @@ int main()
                             error = true;
                             break; 
                         }
-                        args.push_back(new AND_Connector(0, commands.at(i + 1) ));  
+                        args.push_back(new AND_Connector(0, commands.at(i + 1) ));   
                     }
-                    else if(commands.at(i).at(0) == "|")
+                    else if(commands.at(i).at(0) == "||")
                     {
                         if(i == j) 
                         {
@@ -274,7 +285,7 @@ int main()
                             error = true;
                             break; 
                         }
-                        args.push_back(new OR_Connector (0, commands.at(i + 1) ));  
+                        args.push_back(new OR_Connector (0, commands.at(i + 1) ));   
                     }
                 }
             }    
