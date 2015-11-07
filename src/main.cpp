@@ -181,7 +181,7 @@ int main()
                     else// only in use for connector: ;
                     {
                         tokenizer::iterator iter3 = iter2;
-                        iter2++;
+                        iter3++;
                         if(iter3 != tkn.end())
                         {
                             if(*iter3 == ";")
