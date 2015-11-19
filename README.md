@@ -19,3 +19,35 @@ The **exit** command has been changed. Instead of closing the terminal when it i
 
 Known Bugs
 ---------
+***cd:*** cannot run in rshell, because it is built-in to bash 
+
+***'#' at the end of the word:***
+
+  ```sh 
+  $ echo hello# world
+  
+  RSHELL OUTPUT: 
+  hello
+  
+  BASH OUTPUT: 
+  hello# world
+  ```
+  
+***TAB:*** If a tab is entered in a string of commands, rshell does not remove the TAB, instead attaching it to the beginning of a command. Therefore, the command will not run.
+
+  ```sh 
+  $ echo hello;     ls
+  
+  RSHELL OUTPUT: 
+  hello 
+  execvp failed in child
+  
+  BASH OUTPUT: 
+  hello 
+  LICENSE Makefile README.md src tests
+  ```
+  
+***Consecutive spaces:*** Causes an out-of-range error rather than reprompting
+
+***Creating new file with cat:*** Does not recognize redirection symbol and will not run the command.
+  
