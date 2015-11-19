@@ -279,12 +279,17 @@ int main()
                         break;
                     }
                     else if(i == 0 && commands.at(i).at(0) == "&&") 
-                   {
+                    {
                         cout << "Syntax error near unexpected token \"&&\"" << endl; 
                         error = true;
                         break;
                     }
-    
+                    
+                    else if(i == 0 && comands.at(i).at(0) == "()")
+                    {
+                        args.push_back(new Paren(0, 0, 0, commands.at(i + 1) )); 
+                        error = args.at(args.size() - 1)->get_error(); 
+                    }
                     //SPECIAL CASE: First command is always run
                     else if(i == 0) 
                     {
@@ -309,7 +314,19 @@ int main()
                             error = true;
                             break; 
                         }
-                        args.push_back(new AND_Connector(0, commands.at(i + 1) ));   
+                        if(commands.at(i + 1).at(0) == "()") 
+                        {
+                            //Set is_and_1 == 1, prev_state = 0, 
+                            //and passes vector<string> in
+                            args.push_back(new Paren(1, 0, 0, commands.at(i + 1) )); 
+                            //Checks if there was an error while parsing 
+                            //commands inside the parentheses constructor
+                            error = args.at(args.size() - 1)->get_error(); 
+                        }
+                        else
+                        {
+                            args.push_back(new AND_Connector(0, commands.at(i + 1) ));
+                        }   
                     }
                     else if(commands.at(i).at(0) == "||")
                     {
@@ -319,7 +336,19 @@ int main()
                             error = true;
                             break; 
                         }
-                        args.push_back(new OR_Connector (0, commands.at(i + 1) ));   
+                        if(commands.at(i + 1).at(0) == "()") 
+                        {
+                            //Sets is_or_1 = 1, prev_state = 0, 
+                            //and passes vector<string> in
+                            args.push_back(new Paren(0, 1, 0, commands.at(i + 1) ));
+                            //Checks if there was an error while parsing
+                            //commands inside the parentheses constructor
+                            error = args.at(args.size() - 1)->get_error();   
+                        }
+                        else
+                        {
+                            args.push_back(new OR_Connector (0, commands.at(i + 1) ));
+                        }   
                     }
                 }
             }    
