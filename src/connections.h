@@ -286,3 +286,109 @@ class OR_Connector: public Connectors
             }   
         }
 };
+
+class Paren: class Connectors
+{
+    private:  
+       vector<Connector *> v;   
+       bool is_and; 
+       bool is_or; 
+       bool error_check; 
+
+    public: 
+       Paren(bool is_and_1, bool is_or_1, 
+             bool prev, vector<string> commands)
+       { 
+            is_and = is_and_1; 
+            is_or = is_or_1; 
+            set_prevstate(prev); 
+
+            error_check = false; 
+
+            while(!error_check)
+            {
+                unsigned int j = commands.size() - 1;   
+                for(unsigned int i = 0; i < commands.size(); i++) 
+                //Traverses through outer vector 
+                { 
+                    if(i == 0 && commands.at(i).at(0) == ";") 
+                    {
+                        cout << "Syntax error near unexpected token ';'" << endl;
+                        error_check = true;
+                        break; 
+                    }
+                    else if(i == 0 && commands.at(i).at(0) == "||") 
+                    {
+                        cout << "Syntax error near unexpected token \"||\"" << endl; 
+                        error_check = true;
+                        break;
+                    }
+                    else if(i == 0 && commands.at(i).at(0) == "&&") 
+                    {
+                        cout << "Syntax error near unexpected token \"&&\"" << endl; 
+                        error_check = true;
+                        break;
+                    }
+
+                    //SPECIAL CASE: First command is always run
+                    else if(i == 0) 
+                    {
+                        v.push_back(new Semicolon_Connector(0, commands.at(i) )); 
+                    }
+                    else if(commands.at(i).at(0) == ";") 
+                    {
+                        if(i == j)
+                        {
+                            cout << "Syntax error" << endl;
+                            error_check  = true;
+                            break;
+                        } 
+                        v.push_back(new Semicolon_Connector(0, commands.at(i + 1)));  
+                    } 
+                    else if(commands.at(i).at(0) == "&&")
+                    { 
+                        if(i == j) 
+                        {
+
+                            cout << "Syntax error" << endl;
+                            error_check = true;
+                            break; 
+                        }
+                        v.push_back(new AND_Connector(0, commands.at(i + 1) ));   
+                    }
+                    else if(commands.at(i).at(0) == "||")
+                    {
+                        if(i == j) 
+                        {
+                            cout << "Syntax error" << endl;
+                            error_check = true;
+                            break; 
+                        }
+                        v.push_back(new OR_Connector (0, commands.at(i + 1) ));   
+                        }
+                    }
+            }
+       }
+
+       virtual void execute()
+       {
+            if(is_or && get_prevstate)
+            {
+                return; 
+            }
+            else if(is_and && !get_prevstate)
+            {
+                return; 
+            }
+
+            for(unsigned int i = 0; i < v.size(); i++)
+            {
+                v.at(i)->execute;       
+            }
+            set_prevstate(v.at(v.size() - 1)->get_prevstate()); 
+       }
+       bool get_error()
+       {
+           return error_check; 
+       }
+};
