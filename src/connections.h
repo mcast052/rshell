@@ -470,14 +470,15 @@ class Paren: public Connectors
             is_and = is_and_1; 
             is_or = is_or_1; 
             set_prevstate(prev); 
-
+            set_exit(0); 
             set_error(0);  
             
+            //cout << "CHECK 1" << endl;  
             vector< vector<string> > commands;
             vector<string> indivcommand;
             bool ifHash = false;   
             for(unsigned int i = 0; i < com.size(); i++)
-            {   
+            {    
                 if(com.at(i) == "#")
                 {
                     if(indivcommand.size() != 0)
@@ -492,6 +493,7 @@ class Paren: public Connectors
                         break; 
                     }
                 }
+
                 if(com.at(i) == ";")
                 {
                     if(indivcommand.size() != 0)
@@ -499,6 +501,9 @@ class Paren: public Connectors
                         commands.push_back(indivcommand); 
                     }
                     indivcommand.clear(); 
+                    indivcommand.push_back(com.at(i)); 
+                    commands.push_back(indivcommand); 
+                    indivcommand.clear();  
                 }
                 else if(com.at(i) == "&&")
                 {
@@ -506,6 +511,9 @@ class Paren: public Connectors
                     {
                         commands.push_back(indivcommand); 
                     }
+                    indivcommand.clear();
+                    indivcommand.push_back(com.at(i)); 
+                    commands.push_back(indivcommand); 
                     indivcommand.clear(); 
                 }
                 else if(com.at(i) == "||")
@@ -515,76 +523,101 @@ class Paren: public Connectors
                         commands.push_back(indivcommand); 
                     }
                     indivcommand.clear(); 
+                    indivcommand.push_back(com.at(i)); 
+                    commands.push_back(indivcommand); 
+                    indivcommand.clear(); 
+                }
+                else
+                {
+                    //cout << "Inserting into indivcommand: " << com.at(i) << endl; 
+                    indivcommand.push_back(com.at(i)); 
                 }
             }
-            if(!indivcommand.empty() && ifHash)
+            if(!indivcommand.empty() && ifHash == false)
             {
                 commands.push_back(indivcommand); 
             }
 
-            while(!get_error())
+            /*
+            //outputs the vector
+            cout << "CHECK 2" << endl; 
+            for(unsigned int i = 0; i < commands.size(); i++)
             {
-                unsigned int j = commands.size() - 1;   
-                for(unsigned int i = 0; i < commands.size(); i++) 
-                //Traverses through outer vector 
-                { 
-                    if(i == 0 && commands.at(i).at(0) == ";") 
+                cout << "Command at vector " << i << " contains: " ;
+                for(unsigned int j = 0; j < commands.at(i).size();j++)
+                {
+                    cout << commands.at(i).at(j)<< " ";
+                }
+                cout << endl;
+            } 
+
+            cout << "CHECK 3" << endl; 
+            */
+            unsigned int j = commands.size() - 1;   
+            for(unsigned int i = 0; i < commands.size(); i++) 
+            //Traverses through outer vector 
+            { 
+                if(i == 0 && commands.at(i).at(0) == ";") 
+                {
+                    cout << "Syntax error near unexpected token ';'" << endl;
+                    set_error(1); 
+                    break; 
+                }
+                else if(i == 0 && commands.at(i).at(0) == "||") 
+                {
+                    cout << "Syntax error near unexpected token \"||\"" << endl; 
+                    set_error(1); 
+                    break;
+                }
+                else if(i == 0 && commands.at(i).at(0) == "&&") 
+                {
+                    cout << "Syntax error near unexpected token \"&&\"" << endl; 
+                    set_error(1); 
+                    break;
+                }
+                
+
+                //SPECIAL CASE: First command is always run
+                else if(i == 0) 
+                {
+                    v.push_back(new Semicolon_Connector(0, commands.at(i) )); 
+                }
+                else if(commands.at(i).at(0) == ";") 
+                {
+                    if(i == j)
                     {
-                        cout << "Syntax error near unexpected token ';'" << endl;
+                        cout << "Syntax error" << endl;
+                        set_error(1); 
+                        break;
+                    } 
+                    v.push_back(new Semicolon_Connector(0, commands.at(i + 1)));  
+                    //cout << "NEW SEMI" << endl; 
+                } 
+                else if(commands.at(i).at(0) == "&&")
+                { 
+                    if(i == j) 
+                    {
+
+                        cout << "Syntax error" << endl;
                         set_error(1); 
                         break; 
                     }
-                    else if(i == 0 && commands.at(i).at(0) == "||") 
+                    v.push_back(new AND_Connector(0, commands.at(i + 1) ));   
+                    //cout << "NEW AND" << endl; 
+                }
+                else if(commands.at(i).at(0) == "||")
+                {
+                    if(i == j) 
                     {
-                        cout << "Syntax error near unexpected token \"||\"" << endl; 
+                        cout << "Syntax error" << endl;
                         set_error(1); 
-                        break;
+                        break; 
                     }
-                    else if(i == 0 && commands.at(i).at(0) == "&&") 
-                    {
-                        cout << "Syntax error near unexpected token \"&&\"" << endl; 
-                        set_error(1); 
-                        break;
-                    }
-
-                    //SPECIAL CASE: First command is always run
-                    else if(i == 0) 
-                    {
-                        v.push_back(new Semicolon_Connector(0, commands.at(i) )); 
-                    }
-                    else if(commands.at(i).at(0) == ";") 
-                    {
-                        if(i == j)
-                        {
-                            cout << "Syntax error" << endl;
-                            set_error(1); 
-                            break;
-                        } 
-                        v.push_back(new Semicolon_Connector(0, commands.at(i + 1)));  
-                    } 
-                    else if(commands.at(i).at(0) == "&&")
-                    { 
-                        if(i == j) 
-                        {
-
-                            cout << "Syntax error" << endl;
-                            set_error(1); 
-                            break; 
-                        }
-                        v.push_back(new AND_Connector(0, commands.at(i + 1) ));   
-                    }
-                    else if(commands.at(i).at(0) == "||")
-                    {
-                        if(i == j) 
-                        {
-                            cout << "Syntax error" << endl;
-                            set_error(1); 
-                            break; 
-                        }
-                        v.push_back(new OR_Connector (0, commands.at(i + 1) ));   
-                        }
-                    }
+                    v.push_back(new OR_Connector (0, commands.at(i + 1) ));   
+                    //cout << "NEW OR" << endl; 
+                }
             }
+        
        }
 
        virtual void execute()
@@ -597,11 +630,27 @@ class Paren: public Connectors
             {
                 return; 
             }
-
-            for(unsigned int i = 0; i < v.size(); i++)
+        
+            unsigned int i = 0; 
+            bool exitchk = false; 
+            for(i = 0; i < v.size() - 1; i++)
             {
+                //cout << "PREVIOUS STATE: " << get_prevstate() << endl; 
                 v.at(i)->execute();       
+                bool prev = v.at(i)->get_prevstate(); 
+                v.at(i + 1)->set_prevstate(prev); 
+                exitchk = v.at(i)->get_exit();
+                 
+                if(exitchk == true)
+                { 
+                    return; 
+                }                
             }
-            set_prevstate(v.at(v.size() - 1)->get_prevstate()); 
+            v.at(i)->execute();
+            if(!exitchk)
+            {
+                exitchk = v.at(i)->get_exit(); 
+            }    
+            set_prevstate(v.at(v.size() - 1)->get_prevstate());                           
        }
 };
