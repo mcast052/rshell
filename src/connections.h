@@ -87,7 +87,7 @@ class Semicolon_Connector: public Connectors
            else if(first.compare(test_check) == 0)
            {
                struct stat sb; 
-               if(stat(argv[1], &sb) == -1) 
+               if(stat(argv[2], &sb) == -1) 
                {
                    perror("stat"); 
                    set_prevstate(0); 
@@ -191,6 +191,7 @@ class AND_Connector: public Connectors
     private: 
         const char * argv[25];
         string first; 
+        vector<string> test; 
 
     public:
         AND_Connector(bool prev, const vector<string> & args)
@@ -198,6 +199,7 @@ class AND_Connector: public Connectors
             set_prevstate(prev);
             first = args.at(0); 
             set_exit(0); 
+            test = args; 
 
             unsigned int i = 0;   
             for(i = 0; i < args.size(); i++)
@@ -215,57 +217,108 @@ class AND_Connector: public Connectors
             else
             {
                string exitcheck = "exit";
+               string test_check = "test"; 
                if(first.compare(exitcheck) == 0)
                { 
                    set_exit(1); 
                    return;
                }
-               pid_t c_pid = fork(); //Child's process ID
-               pid_t pid; //Parent's process ID  
-               int status; //Will indicate the status of the child process
-               if(c_pid < 0) 
+               else if(first.compare(test_check) == 0)
                {
-                    perror("Error forking child"); 
-                    set_prevstate(0); 
-                    return;     
-               } 
-               else if(c_pid == 0)
-               {
-                   //If fork() == 0, this fork is the child process
-                    int run = execvp(argv[0], const_cast<char * const *>(argv));
-                    if( run == -1) 
-                    {  
-                        perror("execvp failed in child");
-                        set_prevstate(0);
-                        //return;
-                        exit(127); 
-                    }     
+                   struct stat sb; 
+                   if(stat(argv[2], &sb) == -1) 
+                   {
+                       perror("stat"); 
+                       set_prevstate(0); 
+                       return; 
+                   }
+
+                   bool if_exists = false; 
+                   bool if_reg = false; 
+                   bool if_dir = false; 
+                   for(unsigned int i = 0; i < test.size(); i++)
+                   {
+                       if(test.at(i) == "-e")
+                       {
+                           if_exists = true;  
+                       }
+                       else if(test.at(i) == "-f")
+                       {
+                           if_reg = true;  
+                       }
+                       else if(test.at(i) == "-d")
+                       {
+                           if_dir = true;  
+                       }
+                   } 
+
+                   if(if_exists)
+                   {
+                       set_prevstate(1); 
+                   }
+                   if(if_reg && S_ISREG(sb.st_mode))
+                   {
+                       set_prevstate(1); 
+                   }
+                   else 
+                   {
+                       set_prevstate(0); 
+                   }
+                   if(if_dir && S_ISDIR(sb.st_mode))
+                   {
+                       set_prevstate(1); 
+                   }
+                   else
+                   {
+                       set_prevstate(0); 
+                   }
                }
-               else
-               {
-                    if((pid = waitpid(c_pid, &status, 0)) < 0) 
-                    { 
-                        //perror("ERROR");
-                        //if waitpid returns -1, there was an ERROR 
-                        perror("ERROR while waiting"); 
-                        set_prevstate(0); 
-                        return; 
-                    }
-                    //else, child process if finished and the parent can continue
-                    //the rest of its process
-                    if(status == 0)
-                    {
-                        set_prevstate(1); 
-                        return; 
-                    }
-                    else if(status != 0)
-                    {    
-                        set_prevstate(0); 
-                        return;
-                    }  
-                    
+                   pid_t c_pid = fork(); //Child's process ID
+                   pid_t pid; //Parent's process ID  
+                   int status; //Will indicate the status of the child process
+                   if(c_pid < 0) 
+                   {
+                       perror("Error forking child"); 
+                       set_prevstate(0); 
+                       return;     
+                   } 
+                   else if(c_pid == 0)
+                   {
+                       //If fork() == 0, this fork is the child process
+                       int run = execvp(argv[0], const_cast<char * const *>(argv));
+                       if( run == -1) 
+                       {  
+                           perror("execvp failed in child");
+                           set_prevstate(0);
+                           //return;
+                           exit(127); 
+                       }     
+                   }
+                   else
+                   {
+                       if((pid = waitpid(c_pid, &status, 0)) < 0) 
+                       { 
+                           //perror("ERROR");
+                           //if waitpid returns -1, there was an ERROR 
+                           perror("ERROR while waiting"); 
+                           set_prevstate(0); 
+                           return; 
+                       }
+                       //else, child process if finished and the parent can continue
+                       //the rest of its process
+                       if(status == 0)
+                       {
+                           set_prevstate(1); 
+                           return; 
+                       }
+                       else if(status != 0)
+                       {    
+                           set_prevstate(0); 
+                           return;
+                       }  
+
+                   }
                }
-            }
            
         }
 }; 
@@ -275,13 +328,14 @@ class OR_Connector: public Connectors
     private: 
         const char * argv[25]; 
         string first;  
-
+        vector<string> test; 
     public:
         OR_Connector(bool prev, const vector<string> &args)
         {
             first = args.at(0); 
             set_prevstate(prev); 
             set_exit(0); 
+            test = args; 
 
             unsigned int i = 0;  
             for(i = 0; i < args.size(); i++)
@@ -298,56 +352,107 @@ class OR_Connector: public Connectors
             } 
             else
             { 
+                string test_check = "test"; 
                 string exitcheck = "exit";
                 if(first.compare(exitcheck) == 0)
                 { 
                     set_exit(1); 
                     return;
                 }
-                //Execute command (only when previous command fails
-                pid_t c_pid = fork(); //Child's process ID
-                pid_t pid; //Parent's process ID  
-                int status; //Will indicate the status of the child process 
-            
-                if(c_pid < 0)
-                { 
-                    set_prevstate(0);    
-                    return; 
-                }   
-                else if(c_pid == 0) 
+                else if(first.compare(test_check) == 0)
                 {
-                    //If fork() == 0, this fork is the child process
-                    int run = execvp(argv[0], const_cast<char * const *>(argv));
-                    if( run == -1) 
-                    {  
-                        perror("execvp failed in child");
-                        set_prevstate(0);
-                        exit(127); 
-                    }                     
-                }
-                else 
-                {
-                    if((pid = waitpid(c_pid, &status, 0)) < 0) 
+                    struct stat sb; 
+                    if(stat(argv[2], &sb) == -1) 
                     {
-                        perror("ERROR while waiting");
-                        //if waitpid returns -1, there was an ERROR 
-                        set_prevstate(0);
-                        return;  
-                    }
-                    //else, child process if finished and the parent can continue
-                    //the rest of its process.
-                    if(status == 0) 
-                    { 
-                        set_prevstate(1); 
-                        return;
-                    }
-                    else if(status != 0) 
-                    {   
+                        perror("stat"); 
                         set_prevstate(0); 
                         return; 
                     }
+
+                    bool if_exists = false; 
+                    bool if_reg = false; 
+                    bool if_dir = false; 
+                    for(unsigned int i = 0; i < test.size(); i++)
+                    {
+                        if(test.at(i) == "-e")
+                        {
+                            if_exists = true;  
+                        }
+                        else if(test.at(i) == "-f")
+                        {
+                            if_reg = true;  
+                        }
+                        else if(test.at(i) == "-d")
+                        {
+                            if_dir = true;  
+                        }
+                    } 
+
+                    if(if_exists)
+                    {
+                        set_prevstate(1); 
+                    }
+                    if(if_reg && S_ISREG(sb.st_mode))
+                    {
+                        set_prevstate(1); 
+                    }
+                    else 
+                    {
+                        set_prevstate(0); 
+                    }
+                    if(if_dir && S_ISDIR(sb.st_mode))
+                    {
+                        set_prevstate(1); 
+                    }
+                    else
+                    {
+                        set_prevstate(0); 
+                    }
                 }
-            }   
+                    //Execute command (only when previous command fails
+                    pid_t c_pid = fork(); //Child's process ID
+                    pid_t pid; //Parent's process ID  
+                    int status; //Will indicate the status of the child process 
+
+                    if(c_pid < 0)
+                    { 
+                        set_prevstate(0);    
+                        return; 
+                    }   
+                    else if(c_pid == 0) 
+                    {
+                        //If fork() == 0, this fork is the child process
+                        int run = execvp(argv[0], const_cast<char * const *>(argv));
+                        if( run == -1) 
+                        {  
+                            perror("execvp failed in child");
+                            set_prevstate(0);
+                            exit(127); 
+                        }                     
+                    }
+                    else 
+                    {
+                        if((pid = waitpid(c_pid, &status, 0)) < 0) 
+                        {
+                            perror("ERROR while waiting");
+                            //if waitpid returns -1, there was an ERROR 
+                            set_prevstate(0);
+                            return;  
+                        }
+                        //else, child process if finished and the parent can continue
+                        //the rest of its process.
+                        if(status == 0) 
+                        { 
+                            set_prevstate(1); 
+                            return;
+                        }
+                        else if(status != 0) 
+                        {   
+                            set_prevstate(0); 
+                            return; 
+                        }
+                    }
+                }   
         }
 };
 
