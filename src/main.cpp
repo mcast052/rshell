@@ -37,7 +37,7 @@ int main()
         {
             //parses
             typedef tokenizer<char_separator<char> > tokenizer;
-            char_separator<char> sep(" $", ";#|&()");
+            char_separator<char> sep(" $", ";#|&()[]");
             tokenizer tkn(tkn_check,sep);
             bool error = false;
 
@@ -439,6 +439,11 @@ int main()
                     if(commands.at(i).at(0) == "(" && commands.at(i).at(commands.at(i).size() - 1) == ")")
                     {
                         commands.at(i).at(0) = "()";
+                        commands.at(i).pop_back();
+                    }
+                    if(commands.at(i).at(0) == "[" && commands.at(i).at(commands.at(i).size() - 1) == "]")
+                    {
+                        commands.at(i).at(0) = "test";
                         commands.at(i).pop_back();
                     }
                 }            
