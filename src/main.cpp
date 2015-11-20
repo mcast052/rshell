@@ -293,7 +293,7 @@ int main()
                         break;
                     }
                     
-                    else if(i == 0 && comands.at(i).at(0) == "()")
+                    else if(i == 0 && commands.at(i).at(0) == "()")
                     {
                         args.push_back(new Paren(0, 0, 0, commands.at(i + 1) )); 
                         error = args.at(args.size() - 1)->get_error(); 
