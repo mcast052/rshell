@@ -86,6 +86,19 @@ class Semicolon_Connector: public Connectors
            }           
            else if(first.compare(test_check) == 0)
            {
+               int sz = test.size(); 
+               const char * null_check = argv[1]; 
+               bool flag_check = test.at(1) == "-e" || test.at(1) == "-d" || test.at(1) == "-f"; 
+               if(sz == 2 && null_check != NULL && flag_check)
+               {
+                  set_prevstate(1); 
+                  return; 
+               }
+               else if( sz == 2 && (null_check == NULL || !flag_check) )
+               {
+                  set_prevstate(0); 
+                  return; 
+               } 
                struct stat sb; 
                if(stat(argv[2], &sb) == -1) 
                {
@@ -225,6 +238,19 @@ class AND_Connector: public Connectors
                }
                else if(first.compare(test_check) == 0)
                {
+                   int sz = test.size(); 
+                   const char * null_check = argv[1]; 
+                   bool flag_check = test.at(1) == "-e" || test.at(1) == "-d" || test.at(1) == "-f"; 
+                   if(sz == 2 && null_check != NULL && flag_check)
+                   {
+                        set_prevstate(1); 
+                        return; 
+                   }
+                   else if(sz == 2 && (null_check == NULL || !flag_check) )
+                   {
+                       set_prevstate(0); 
+                       return; 
+                   }
                    struct stat sb; 
                    if(stat(argv[2], &sb) == -1) 
                    {
@@ -361,6 +387,19 @@ class OR_Connector: public Connectors
                 }
                 else if(first.compare(test_check) == 0)
                 {
+                    int sz = test.size(); 
+                    const char * null_check = argv[1]; 
+                    bool flag_check = (test.at(1) == "-e" || test.at(1) == "-f" || test.at(1) == "-d");
+                    if(sz  == 2 && null_check != NULL && flag_check)
+                    {
+                        set_prevstate(1); 
+                        return; 
+                    }
+                    else if(sz == 2 && (null_check == NULL || !flag_check))
+                    {
+                        set_prevstate(0); 
+                        return; 
+                    }
                     struct stat sb; 
                     if(stat(argv[2], &sb) == -1) 
                     {
