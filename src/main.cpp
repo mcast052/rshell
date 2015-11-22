@@ -125,6 +125,55 @@ int main()
                 {
                     while(*iter2 != ")")
                     {
+                        if(*iter2 == "echo")
+                        {
+                            string tempQuote; 
+                            for(tokenizer::iterator echoiter = iter2;echoiter != tkn.end(); ++echoiter)
+                            {
+                                if(*echoiter == "\"")
+                                {
+                                    while(iter2 != echoiter)
+                                    {
+                                        if(*iter2 != "\"")
+                                        {
+                                            if(*iter2 == "echo")
+                                            {
+                                                indivCommand.push_back(*iter2);
+                                            }
+                                            else
+                                            {
+                                                if(tempQuote == "")
+                                                {
+                                                    tempQuote = *iter2;
+                                                }
+                                                else
+                                                {
+                                                    if(*iter2 != "\"")
+                                                    {
+                                                        tempQuote += " " + *iter2;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        iter2++;
+                                    }
+                                    while(*iter2 != "\"")
+                                    {
+                                        indivCommand.push_back(*iter2);
+                                        iter2++;
+                                        break; 
+                                    }
+                                    if(tempQuote != "")
+                                    {
+                                        indivCommand.push_back(tempQuote);
+                                    }
+                                    tempQuote = "";
+                                }
+                        
+                            }
+                     
+                        }
+
                         if(*iter2 == ";" || *iter2 == "|" || *iter2 == "&")
                         {
                             if(*iter2 == "|" || *iter2 == "&")
@@ -272,7 +321,10 @@ int main()
                         }
                         else
                         {
-                            indivCommand.push_back(*iter2);
+                            if(*iter2 != "\"")
+                            {
+                                indivCommand.push_back(*iter2);
+                            }
                         }
                         iter2++;
                             }
@@ -509,7 +561,9 @@ int main()
                     cout << commands.at(i).at(j)<< " ";
                 }
                 cout << endl;
-            } 
+            }
+
+           cout << "Passes second print" << endl; 
              
             if(error == false && commands.size() > 0)
             {
@@ -603,7 +657,8 @@ int main()
                         }   
                     }
                 }
-            }    
+            }
+            cout << "passes loop" << endl;    
 
             if(error == false && commands.size() > 0)
             {
