@@ -37,7 +37,7 @@ int main()
         {
             //parses
             typedef tokenizer<char_separator<char> > tokenizer;
-            char_separator<char> sep(" $", ";#|&()[]");
+            char_separator<char> sep(" $", ";#|&()[]\"");
             tokenizer tkn(tkn_check,sep);
             bool error = false;
 
@@ -54,6 +54,7 @@ int main()
             vector<string> indivCommand;
 
             tokenizer::iterator iter2;
+            tokenizer::iterator ite3 = tkn.begin();
             bool ifHash = false;
             for(iter2 = tkn.begin();iter2 != tkn.end(); ++iter2)
             {
@@ -72,6 +73,54 @@ int main()
                         break;
                     }
                 }
+               
+                if(*iter2 == "echo")
+                {
+                    string tempQuote; 
+                    for(tokenizer::iterator echoiter = iter2;echoiter != tkn.end(); ++echoiter)
+                    {
+                        if(*echoiter == "\"")
+                        {
+                            while(iter2 != echoiter)
+                            {
+                                if(*iter2 != "\"")
+                                {
+                                    if(*iter2 == "echo")
+                                    {
+                                        indivCommand.push_back(*iter2);
+                                    }
+                                    else
+                                    {
+                                        if(tempQuote == "")
+                                        {
+                                            tempQuote = *iter2;
+                                        }
+                                        else
+                                        {
+                                            tempQuote += " " + *iter2;
+                                        }
+                                    }
+                                }
+                                iter2++;
+                            }
+                            while(*iter2 != "\"")
+                            {
+                                indivCommand.push_back(*iter2);
+                                iter2++;
+                               break; 
+                            }
+                            if(tempQuote != "")
+                            {
+                                indivCommand.push_back(tempQuote);
+                            }
+                            tempQuote = "";
+                        }
+                        
+                    }
+                     
+                }
+               
+          
                 if(*iter2 == "(")
                 {
                     while(*iter2 != ")")
@@ -407,8 +456,12 @@ int main()
                 }
                 else
                 {
-                    indivCommand.push_back(*iter2);
+                   if(*iter2 != "\"")
+                   { 
+                      indivCommand.push_back(*iter2);
+                   }
                 }
+                ite3++;
             }
             //makes sure hash doesnt go into the commands vector
             if(!indivCommand.empty() && ifHash == false)
@@ -431,8 +484,7 @@ int main()
             vector<Connectors *> args;
             if(error == false && commands.size() > 0)
             {
-                //Vector that will hold objects of our class
-                unsigned int j = commands.size() - 1;   
+                //Vector that will hold objects of our class  
                 for(unsigned int i = 0; i < commands.size(); i++) 
                     //Traverses through outer vector 
                 {
