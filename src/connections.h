@@ -706,7 +706,14 @@ class Paren: public Connectors
             }
         
        }
-
+       ~Paren()
+       {
+           for(unsigned int i = 0; i < v.size(); i++)
+           {
+               delete v.at(i); 
+           }
+           v.clear(); 
+       }
        virtual void execute()
        {
             if(is_or && this->get_prevstate())
