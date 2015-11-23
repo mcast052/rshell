@@ -1,0 +1,42 @@
+Script started on Sun 22 Nov 2015 06:44:50 PM PST
+]0;mcast052@hammer:~/CS100/Assignment1/rshell[?1034h[mcast052@hammer rshell]$ make
+g++ -Wall -Werror -ansi -pedantic src/main.cpp -o rshell
+mkdir bin
+mv rshell bin
+]0;mcast052@hammer:~/CS100/Assignment1/rshell[mcast052@hammer rshell]$ bin/rshell
+mcast052@hammer.cs.ucr.edu$ [] || echo fail
+Error: zero arguments
+fail
+mcast052@hammer.cs.ucr.edu$ test || echo fail
+Error: zero arguments
+fail
+mcast052@hammer.cs.ucr.edu$ test -d && echo pass
+pass
+mcast052@hammer.cs.ucr.edu$ test -e && echo pass
+pass
+mcast052@hammer.cs.ucr.edu$ test -f && echo pass
+pass
+mcast052@hammer.cs.ucr.edu$ test -n || echo fail
+fail
+mcast052@hammer.cs.ucr.edu$ [ ls
+bin  LICENSE  Makefile	README.md  src	test_command.script  tests
+mcast052@hammer.cs.ucr.edu$ test -d "src" && echo pass
+pass
+mcast052@hammer.cs.ucr.edu$ poop || [-f src/main.cpp\ ] && echo pass
+execvp failed in child: No such file or directory
+pass
+mcast052@hammer.cs.ucr.edu$ echo hello world && [-e test    "tests/single_command.script"] && echo pass
+hello world
+pass
+mcast052@hammer.cs.ucr.edu$ test -e README.md && echo pass 
+pass
+mcast052@hammer.cs.ucr.edu$ test -f "bin/rshell" && echo pass
+pass
+mcast052@hammer.cs.ucr.edu$ [-e "asdlfjlkjd/adljflkj/aldjflkn"] || echo fail
+stat: No such file or directory
+fail
+mcast052@hammer.cs.ucr.edu$ exit
+]0;mcast052@hammer:~/CS100/Assignment1/rshell[mcast052@hammer rshell]$ exit
+exit
+
+Script done on Sun 22 Nov 2015 06:49:25 PM PST
