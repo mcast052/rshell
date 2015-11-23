@@ -567,6 +567,19 @@ int main()
                 for(unsigned int i = 0; i < commands.size(); i++) 
                     //Traverses through outer vector 
                 {
+                    if(commands.at(i).at(0) != "(" && commands.at(i).at(commands.at(i).size() - 1) == ")")
+                    {
+                        cout << "Syntax error" << endl;
+                        error = true;
+                        break;
+                    }
+                    if(commands.at(i).at(0) != "[" && commands.at(i).at(commands.at(i).size() - 1) == "]")
+                    {
+                        cout << "Syntax error" << endl;
+                        error = true;
+                        break;
+                    }
+
                     if(commands.at(i).at(0) == "(" && commands.at(i).at(commands.at(i).size() - 1) == ")")
                     {
                         commands.at(i).at(0) = "()";
