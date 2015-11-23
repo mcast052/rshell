@@ -42,12 +42,12 @@ int main()
             bool error = false;
 
             //Shows where it is parsed
-            /*            
+                        
             for(tokenizer::iterator iter = tkn.begin();iter != tkn.end();
                     ++iter)
             {
                 cout << *iter << endl;   
-            }*/
+            }
 
             //puts the parsed values into vectors by  command and connectors
             vector< vector<string> > commands;
@@ -127,7 +127,7 @@ int main()
           
                 if(*iter2 == "(")
                 {
-                    while(*iter2 != ")")
+                    while(*iter2 != "(")
                     {
                         if(*iter2 == "echo")
                         {
@@ -334,17 +334,17 @@ int main()
                             }
                         }
                         iter2++;
+                       
                     }
-                    if(iter2 == tkn.end())
-                    {
-                        cout << "Syntax error at '('" << endl; 
-                    indivCommand.push_back(*iter2);
-                    commands.push_back(indivCommand);
-                    indivCommand.clear();
-                    
-                }
-                
-                else if(*iter2 == ";" || *iter2 == "|" || *iter2 == "&")
+                    if(iter2 != tkn.end() && error == 0)
+                    { 
+                        indivCommand.push_back(*iter2);
+                        commands.push_back(indivCommand);
+                        indivCommand.clear();
+                    }
+                } 
+
+                else if((*iter2 == ";" || *iter2 == "|" || *iter2 == "&") && error == 0)
                 {
                     if(*iter2 == "|" || *iter2 == "&")
                     {
@@ -392,9 +392,7 @@ int main()
                                         // clears vector againv
                                         break;
                                     }
-                                    else
-                                        break;
-                                    }
+                                    
                                     else
                                     {
                                         //if the connector goes to: ||| 
@@ -521,7 +519,7 @@ int main()
                 }
                 else
                 {
-                   if(*iter2 != "\"")
+                   if(*iter2 != "\"" && error == 0)
                    { 
                       indivCommand.push_back(*iter2);
                    }
@@ -557,6 +555,18 @@ int main()
                     {
                         commands.at(i).at(0) = "()";
                         commands.at(i).pop_back();
+                    }
+                    else if(commands.at(i).at(0) == "(" && commands.at(i).at(commands.at(i).size() - 1) != ")")
+                    {
+                        cout << "Syntax error at '('" << endl; 
+                        error = true; 
+                        break; 
+                    }
+                    else if(commands.at(i).at(0) != "(" && commands.at(i).at(commands.at(i).size() - 1) == ")")
+                    {
+                        cout << "Syntax error at ')'" << endl; 
+                        error = true; 
+                        break;
                     }
                     if(commands.at(i).at(0) == "[" && commands.at(i).at(commands.at(i).size() - 1) == "]")
                     {
@@ -703,7 +713,7 @@ int main()
                     delete args[i]; 
                 } 
                 args.clear();
-            
+            } 
         }
     } while(!exitcheck); 
     return 0; 
