@@ -51,3 +51,10 @@ Known Bugs
 
 ***Creating new file with cat:*** Does not recognize redirection symbol and will not run the command.
   
+***Quotation mark error inside parentheses:*** Will result in a syntax error, but other commands run afterwards will fail (even ones that should run) and parse them wrong.
+  ```sh
+  $ [echo "hi]
+  
+  RSHELL OUTPUT: 
+  Syntax error
+  ```
