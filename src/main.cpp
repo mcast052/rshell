@@ -42,12 +42,12 @@ int main()
             bool error = false;
 
             //Shows where it is parsed
-            
+            /*            
             for(tokenizer::iterator iter = tkn.begin();iter != tkn.end();
                     ++iter)
             {
                 cout << *iter << endl;   
-            }
+            }*/
 
             //puts the parsed values into vectors by  command and connectors
             vector< vector<string> > commands;
@@ -115,6 +115,10 @@ int main()
                             }
                             tempQuote = "";
                         }
+                        else
+                        {
+                            break; 
+                        }
                         
                     }
                      
@@ -169,9 +173,12 @@ int main()
                                     }
                                     tempQuote = "";
                                 }
-                        
+                                else
+                                {
+                                   break; 
+                                } 
                             }
-                     
+                         
                         }
 
                         if(*iter2 == ";" || *iter2 == "|" || *iter2 == "&")
@@ -327,10 +334,13 @@ int main()
                             }
                         }
                         iter2++;
-                            }
-                            indivCommand.push_back(*iter2);
-                            commands.push_back(indivCommand);
-                            indivCommand.clear();
+                    }
+                    if(iter2 == tkn.end())
+                    {
+                        cout << "Syntax error at '('" << endl; 
+                    indivCommand.push_back(*iter2);
+                    commands.push_back(indivCommand);
+                    indivCommand.clear();
                     
                 }
                 
@@ -380,6 +390,9 @@ int main()
                                         // pushes single connector into commands
                                         indivCommand.clear(); 
                                         // clears vector againv
+                                        break;
+                                    }
+                                    else
                                         break;
                                     }
                                     else
@@ -522,7 +535,7 @@ int main()
             }
 
             //outputs the vector
-            
+            /*
             for(unsigned int i = 0; i < commands.size(); i++)
             {
                 cout << "Command at vector " << i << " contains: " ;
@@ -531,7 +544,7 @@ int main()
                     cout << commands.at(i).at(j)<< " ";
                 }
                 cout << endl;
-            }  
+            }*/  
             
             vector<Connectors *> args;
             if(error == false && commands.size() > 0)
@@ -553,6 +566,7 @@ int main()
                 }            
             }
 
+            /* 
             for(unsigned int i = 0; i < commands.size(); i++)
             {
                 cout << "Command at vector " << i << " contains: " ;
@@ -561,9 +575,9 @@ int main()
                     cout << commands.at(i).at(j)<< " ";
                 }
                 cout << endl;
-            }
+            }*/
 
-           cout << "Passes second print" << endl; 
+            //cout << "Passes second print" << endl; 
              
             if(error == false && commands.size() > 0)
             {
@@ -593,7 +607,7 @@ int main()
                     
                     else if(i == 0 && commands.at(i).at(0) == "()")
                     {
-                        args.push_back(new Paren(0, 0, 0, commands.at(i + 1) )); 
+                        args.push_back(new Paren(0, 0, 0, commands.at(i) )); 
                         error = args.at(args.size() - 1)->get_error(); 
                     }
                     //SPECIAL CASE: First command is always run
@@ -607,9 +621,6 @@ int main()
                         {
                             cout << "Syntax error" << endl;
                             error  = true;
-                            break;
-                        } 
-                        args.push_back(new Semicolon_Connector(0, commands.at(i + 1))); 
                     } 
                     else if(commands.at(i).at(0) == "&&")
                     { 
@@ -658,7 +669,7 @@ int main()
                     }
                 }
             }
-            cout << "passes loop" << endl;    
+            //cout << "passes loop" << endl;    
 
             if(error == false && commands.size() > 0)
             {
