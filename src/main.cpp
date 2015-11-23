@@ -326,8 +326,19 @@ int main()
                                 indivCommand.push_back(*iter2);
                             }
                         }
+
                         iter2++;
-                            }
+                        if(iter2 == tkn.end())
+                        {
+                            cout << "Syntax error" << endl;
+                            error = true;
+                            break;
+                        }
+                    }
+                    if(error == true)
+                    {
+                        break;
+                    }
                             indivCommand.push_back(*iter2);
                             commands.push_back(indivCommand);
                             indivCommand.clear();
@@ -549,6 +560,12 @@ int main()
                     {
                         commands.at(i).at(0) = "test";
                         commands.at(i).pop_back();
+                    }
+                    else if(commands.at(i).at(0) == "[" && commands.at(i).at(commands.at(i).size() - 1) != "]")
+                    {
+                        cout << "Syntax error" << endl;
+                        error = true;
+                        break;
                     }
                 }            
             }
